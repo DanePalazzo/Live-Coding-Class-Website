@@ -9,18 +9,19 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 import secrets
 from dotenv import load_dotenv
+from flask_bcrypt import Bcrypt
 load_dotenv()
 
 # Local imports
 
 
 # deployed version uncomment below code, local version comment out below code
-# app = Flask(
-#     __name__,
-#     static_url_path='',
-#     static_folder='../client/dist',
-#     template_folder='../client/dist'
-# )
+app = Flask(
+    __name__,
+    static_url_path='',
+    static_folder='../client/dist',
+    template_folder='../client/dist'
+)
 
 # Instantiate app, set attributes
 
