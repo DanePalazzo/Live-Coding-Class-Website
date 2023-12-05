@@ -29,8 +29,9 @@ app = Flask(
 # app = Flask(__name__)
 
 # Instantiate app, set attributes
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
+# app = Flask(__name__)
+print(os.environ.get('DATABASE_URI'))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://live_coding_class_website_user:lMkQRfBziI0oGRB8ssZX01Mxjn1oZKj7@dpg-clnpk4ofvntc73b5rr30-a.oregon-postgres.render.com/live_coding_class_website'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
 app.secret_key = secrets.token_hex(16)
