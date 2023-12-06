@@ -3,29 +3,57 @@
 # Standard library imports
 
 # Remote library imports
-from flask import request, render_template
+from flask import request, render_template, session, abort
 from flask_restful import Resource
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Local imports
-from config import app, db, api
+from config import app, db, api, os
+
 # Add your model imports
+from models import *
 
+app.secret_key = os.getenv('SECRET_KEY')
 
+# @app.route('/')
+# def index():
+#     return '<h1>Phase 5 Project Server</h1>'
 
+@app.before_request
+def check_if_logged_in():
+    restricted_access_list = []
+    if (request.endpoint) in restricted_access_list and (not session.get('user_id')):
+        return {'error': '401 Unauthorized'}, 401
 
-@app.route('/')
-def index():
-    return '<h1>Phase 4 Project Server</h1>'
+class Users(Resource):
+    def get(self):
+        users_list = [users.to_dict() for users in User.query.all()]
+        return users_list, 200
+    
+api.add_resource(Users, '/users')
+
+class UserById(Resource):
+    def get(self, id):
+        user = User.query.filter_by(id=id).first()
+        if not user:
+            return {"error": "Customer not found"}, 404
+        return user.to_dict(), 200
+    
+    def delete(self, id):
+        user = User.query.filter_by(id=id).first()
+        if not user:
+            return {"error": "Customer not found"}, 404
+        db.session.delete(user)
+        db.session.commit()
+
+        return "", 204
 
 # Views go here! use either route!
 @app.errorhandler(404)
 def not_found(e):
     return render_template("index.html")
-
-# @app.route('/', defaults={'path': ''})
-# @app.route('/<path:path>')
-# def catch_all(path):
-#     return render_template("index.html")
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
