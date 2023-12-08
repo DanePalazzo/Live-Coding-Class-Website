@@ -16,19 +16,38 @@ from config import app, db, api, os
 # Add your model imports
 from models import *
 
-socketio = SocketIO(app)
+socket_io = SocketIO(app, cors_allowed_origins="*")
 
 app.secret_key = os.getenv('SECRET_KEY')
-
-# @app.route('/')
-# def index():
-#     return '<h1>Phase 5 Project Server</h1>'
 
 @app.before_request
 def check_if_logged_in():
     restricted_access_list = []
     if (request.endpoint) in restricted_access_list and (not session.get('user_id')):
         return {'error': '401 Unauthorized'}, 401
+
+
+@socket_io.on("message")
+def handle_message(data):
+    print("recived message" + data)
+
+
+@socket_io.on('client-message')
+def chat_message(name, message, roomNum):
+    # print(message)
+    socket_io.emit('server-message', {
+        'sender': name,
+        'message': message
+        }, room = roomNum)
+    
+@socket_io.on('room-change')
+def change_room(room):
+    if room == "1":
+        leave_room("2")
+        join_room(room)
+    else:
+        leave_room("1")
+        join_room(room)
 
 class Users(Resource):
     def get(self):

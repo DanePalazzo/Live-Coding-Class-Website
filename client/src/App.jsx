@@ -1,11 +1,31 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
-import './App.css'
+import './CSS/App.css'
+import ChatBrowser from './pages/ChatBrowser'
+import { Switch, Route, createBrowserRouter, createRoutesFromElements, RouterProvider } from "react-router-dom";
 
 function App() {
   const [count, setCount] = useState(0)
 
+
+
+  const router = createBrowserRouter(
+    createRoutesFromElements(
+      <Route path="/" element={<NavLayout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="chatbrowser" element={<ChatBrowser />} />
+        <Route path="login" element={<LogIn />} />
+        <Route path="signup" element={<SignUp />} />
+      </Route>
+    )
+  )
+
+  // return (
+  //   <div className='bg-fit-screen'>
+  //     <RouterProvider router={router} />
+  //   </div>
+  // )
 
   return (
     <>
