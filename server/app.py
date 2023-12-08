@@ -26,15 +26,18 @@ def check_if_logged_in():
     if (request.endpoint) in restricted_access_list and (not session.get('user_id')):
         return {'error': '401 Unauthorized'}, 401
 
+@socket_io.on('connect')
+def handle_connect():
+    print('new connection')
 
-@socket_io.on("message")
-def handle_message(data):
-    print("recived message" + data)
+# @socket_io.on("message")
+# def handle_message(data):
+#     print("recived message" + data)
 
 
 @socket_io.on('client-message')
 def chat_message(name, message, roomNum):
-    # print(message)
+    print(message)
     socket_io.emit('server-message', {
         'sender': name,
         'message': message
@@ -48,6 +51,11 @@ def change_room(room):
     else:
         leave_room("1")
         join_room(room)
+
+@socket_io.on("disconnect")
+def disconnected():
+    """event listener when client disconnects to the server"""
+    print("user disconnected")
 
 class Users(Resource):
     def get(self):
