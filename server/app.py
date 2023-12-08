@@ -6,6 +6,7 @@
 from flask import request, render_template, session, abort
 from flask_restful import Resource
 from dotenv import load_dotenv
+from flask_socketio import SocketIO, join_room, leave_room
 
 load_dotenv()
 
@@ -15,11 +16,13 @@ from config import app, db, api, os
 # Add your model imports
 from models import *
 
+socketio = SocketIO(app)
+
 app.secret_key = os.getenv('SECRET_KEY')
 
-# @app.route('/')
-# def index():
-#     return '<h1>Phase 5 Project Server</h1>'
+@app.route('/')
+def index():
+    return '<h1>Phase 5 Project Server</h1>'
 
 @app.before_request
 def check_if_logged_in():
