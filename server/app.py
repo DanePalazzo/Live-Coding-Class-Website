@@ -20,9 +20,9 @@ socketio = SocketIO(app)
 
 app.secret_key = os.getenv('SECRET_KEY')
 
-@app.route('/')
-def index():
-    return '<h1>Phase 5 Project Server</h1>'
+# @app.route('/')
+# def index():
+#     return '<h1>Phase 5 Project Server</h1>'
 
 @app.before_request
 def check_if_logged_in():
