@@ -10,6 +10,7 @@ from sqlalchemy import MetaData
 import secrets
 from dotenv import load_dotenv
 from flask_bcrypt import Bcrypt
+from flask_socketio import SocketIO, join_room, leave_room
 load_dotenv()
 
 # Local imports
@@ -31,7 +32,7 @@ app = Flask(
 # Instantiate app, set attributes
 # app = Flask(__name__)
 print(os.environ.get('DATABASE_URI'))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://live_coding_class_website_user:lMkQRfBziI0oGRB8ssZX01Mxjn1oZKj7@dpg-clnpk4ofvntc73b5rr30-a.oregon-postgres.render.com/live_coding_class_website'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
 app.secret_key = secrets.token_hex(16)
@@ -57,3 +58,6 @@ api = Api(app)
 CORS(app)
 
 bcrypt = Bcrypt(app)
+
+#socket.io
+socket_io = SocketIO(app, cors_allowed_origins="*")

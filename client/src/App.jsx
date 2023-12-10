@@ -12,7 +12,7 @@ import ChatRoom from './pages/ChatRoom';
 
 
 function App() {
-  const [user, setUser] = useState("")
+  const [user, setUser] = useState("me")
 
 
   const router = createBrowserRouter(

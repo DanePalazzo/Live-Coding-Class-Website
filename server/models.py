@@ -7,15 +7,12 @@ from sqlalchemy import MetaData
 
 bcrypt = Bcrypt()
 
-
 from config import db, metadata
 
-# Models go here!
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(255), nullable=False)
-    # password = db.Column(db.String(255), nullable=False)  # Hash passwords
     _password_hash = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(50))
@@ -25,6 +22,7 @@ class User(db.Model):
     # Relationships
     courses_taught = db.relationship('Course', back_populates='instructor')
     enrollments = db.relationship('Enrollment', back_populates='user')
+    accessible_sessions = db.relationship('SessionParticipant', back_populates='user')
     documents = db.relationship('Document', back_populates='owner')
     editor_permissions = db.relationship('DocumentEditor', back_populates='user')
     edits = db.relationship('DocumentEditHistory', back_populates='editor')
@@ -36,13 +34,11 @@ class User(db.Model):
     
     @password_hash.setter
     def password_hash(self, password):
-        password_hash = bcrypt.generate_password_hash(
-            password.encode('utf-8'))
+        password_hash = bcrypt.generate_password_hash(password.encode('utf-8'))
         self._password_hash = password_hash.decode('utf-8')
 
     def authenticate(self, password):
-        return bcrypt.check_password_hash(
-            self._password_hash, password.encode('utf-8'))
+        return bcrypt.check_password_hash(self._password_hash, password.encode('utf-8'))
 
 class Course(db.Model):
     __tablename__ = 'courses'
@@ -61,13 +57,14 @@ class Course(db.Model):
 class Session(db.Model):
     __tablename__ = 'sessions'
     id = db.Column(db.Integer, primary_key=True)
-    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=True)
     title = db.Column(db.String(255), nullable=False)
     scheduled_time = db.Column(db.DateTime)
     duration = db.Column(db.Interval)
 
     # Relationships
     course = db.relationship('Course', back_populates='sessions')
+    participants = db.relationship('SessionParticipant', back_populates='session')
     documents = db.relationship('Document', back_populates='session')
     messages = db.relationship('ChatMessage', back_populates='session')
 
@@ -82,10 +79,21 @@ class Enrollment(db.Model):
     user = db.relationship('User', back_populates='enrollments')
     course = db.relationship('Course', back_populates='enrollments')
 
+class SessionParticipant(db.Model):
+    __tablename__ = 'session_participants'
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Integer, db.ForeignKey('sessions.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    is_active = db.Column(db.Boolean, default=False)
+
+    # Relationships
+    session = db.relationship('Session', back_populates='participants')
+    user = db.relationship('User', back_populates='accessible_sessions')
+
 class Document(db.Model):
     __tablename__ = 'documents'
     id = db.Column(db.Integer, primary_key=True)
-    session_id = db.Column(db.Integer, db.ForeignKey('sessions.id'), nullable=True)
+    session_id = db.Column(db.Integer, db.ForeignKey('sessions.id'))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     content = db.Column(db.Text)
     verified = db.Column(db.Boolean)
