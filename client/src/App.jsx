@@ -5,10 +5,10 @@ import './CSS/App.css'
 import { Route, createBrowserRouter, createRoutesFromElements, RouterProvider } from "react-router-dom";
 import NavLayout from './pages/NavLayout'
 import Home from './pages/Home'
-import ChatBrowser from './pages/ChatBrowser'
 import LogIn from './pages/LogIn'
 import SignUp from './pages/SignUp'
-import ChatRoom from './pages/ChatRoom';
+import SessionRoom from './pages/SessionRoom';
+import SessionBrowser from './pages/SessionBrowser';
 
 
 function App() {
@@ -19,10 +19,10 @@ function App() {
     createRoutesFromElements(
       <Route path="/" element={<NavLayout />}>
         <Route path="/" element={<Home user={user}/>} />
-        <Route path="chatbrowser" element={<ChatBrowser user={user}/>} />
+        <Route path="sessionbrowser" element={<SessionBrowser user={user}/>} />
         <Route path="login" element={<LogIn user={user} setUser={setUser}/>} />
         <Route path="signup" element={<SignUp user={user}/>} />
-        <Route path="chatroom" element={<ChatRoom user={user}/>} />
+        <Route path="sessionroom" element={<SessionRoom user={user}/>} />
       </Route>
     )
   )

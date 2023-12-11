@@ -9,7 +9,7 @@ export default function NavLayout() {
                 <h1>Live Coding Class</h1>
                 <nav>
                     <NavLink to='/' >Home</NavLink>
-                        <NavLink to='chatbrowser'>Chat Browser</NavLink>
+                        <NavLink to='sessionbrowser'>Session Browser</NavLink>
                         <NavLink to='signup'>Sign Up</NavLink>
                         <NavLink to='login'>Log In</NavLink>
                 </nav>

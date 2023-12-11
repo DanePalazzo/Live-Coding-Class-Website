@@ -13,8 +13,6 @@ from config import socket_io, app, db, api, os
 # Add your model imports
 from models import *
 
-import socket_handlers
-
 app.secret_key = os.getenv('SECRET_KEY')
 
 #### LOGIN AUTHORIZATION ###
@@ -26,24 +24,7 @@ app.secret_key = os.getenv('SECRET_KEY')
 
 
 ################################ SOCKETS ################################
-
-# #CONNECTION
-# @socket_io.on('connect')
-# def handle_connect():
-#     print('new connection')
-
-
-# #USER MESSAGE
-# @socket_io.on('user-message')
-# def chat_message(user_id, session_id, message_txt):
-#     print(f"user: {user_id}, session: {session_id}, message: {message_txt}")
-#     db.session.add()
-    
-# #DISCONNECT
-# @socket_io.on("disconnect")
-# def disconnected():
-#     print("user disconnected")
-
+import socket_handlers
 
 ################################ ROUTES ################################
 
@@ -71,6 +52,7 @@ class BaseResource(Resource):
             db.session.commit()
             return item.to_dict(rules=rules), 200
         except Exception as e:
+            db.session.rollback()
             print(e.__str__())
             return {"error": f"An error occurred while updating: {model.__name__}"}, 400
 
@@ -83,6 +65,7 @@ class BaseResource(Resource):
             db.session.commit()
             return "", 204
         except Exception as e:
+            db.session.rollback()
             print(e.__str__())
             return {"error": f"An error occurred while deleting: {model.__name__}"}, 400
     
@@ -132,6 +115,7 @@ class Courses(BaseResource):
             db.session.commit()
             return new_course.to_dict(), 200
         except Exception as e:
+            db.session.rollback()
             print(e.__str__())
             return {"error": f"An error occurred while posting you message"}, 400
 
@@ -171,6 +155,7 @@ class Sessions(BaseResource):
             db.session.commit()
             return new_session.to_dict(), 200
         except Exception as e:
+            db.session.rollback()
             print(e.__str__())
             return {"error": f"An error occurred while posting you message"}, 400
 
@@ -205,6 +190,7 @@ class Documents(BaseResource):
             new_document = Document(
                 session_id = data["session_id"],
                 owner_id = data["owner_id"],
+                title = data["title"],
                 content = data["content"],
                 verified = data["verified"]
             )
@@ -212,6 +198,7 @@ class Documents(BaseResource):
             db.session.commit()
             return new_document.to_dict(), 200
         except Exception as e:
+            db.session.rollback()
             print(e.__str__())
             return {"error": f"An error occurred while posting you message"}, 400
 
@@ -251,6 +238,7 @@ class ChatMessages(BaseResource):
             db.session.commit()
             return new_chat_message.to_dict(), 200
         except Exception as e:
+            db.session.rollback()
             print(e.__str__())
             return {"error": f"An error occurred while posting you message"}, 400
 
@@ -291,6 +279,7 @@ class Enrollments(BaseResource):
             db.session.commit()
             return new_enrollment.to_dict(), 200
         except Exception as e:
+            db.session.rollback()
             print(e.__str__())
             return {"error": f"An error occurred while posting you message"}, 400
 
@@ -326,6 +315,7 @@ class SessionParticipants(BaseResource):
             db.session.commit()
             return new_session_participant.to_dict(), 200
         except Exception as e:
+            db.session.rollback()
             print(e.__str__())
             return {"error": f"An error occurred while posting you message"}, 400
 
@@ -365,6 +355,7 @@ class DocumentEditors(BaseResource):
             db.session.commit()
             return new_document_editor.to_dict(), 200
         except Exception as e:
+            db.session.rollback()
             print(e.__str__())
             return {"error": f"An error occurred while posting you message"}, 400
 
@@ -404,6 +395,7 @@ class DocumentEditHistories(Resource):
             db.session.commit()
             return new_document_edit_history.to_dict(), 200
         except Exception as e:
+            db.session.rollback()
             print(e.__str__())
             return {"error": f"An error occurred while posting you message"}, 400
 

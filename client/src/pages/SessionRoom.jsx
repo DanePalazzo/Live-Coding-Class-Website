@@ -4,18 +4,15 @@ import ChatBox from '../components/ChatBox'
 
 let socket
 
-function ChatRoom({user}) {
+function SessionRoom({user}) {
     const [messages, setMessages] = useState([])
     const [newMessage, setNewMessage] = useState("")
     const [connected, setConnected] = useState(false)
-    const [roomNum, setRoomNum] = useState("1")
 
     useEffect(() => {
         socket = io('ws://localhost:5555');
         setConnected(true)
-        socket.emit('room-change', "1")
         return () => {
-        //   console.log("closing socket")
           socket.off('disconnected', (msg) => {
               console.log(msg);
             });
@@ -73,4 +70,4 @@ function ChatRoom({user}) {
   )
 }
 
-export default ChatRoom
+export default SessionRoom

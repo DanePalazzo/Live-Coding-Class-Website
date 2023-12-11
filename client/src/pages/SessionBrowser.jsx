@@ -1,11 +1,11 @@
 import { React, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 
-function ChatBrowser({user}) {
+function SessionBrowser({user}) {
     const navigate = useNavigate();
 
     const goToRoom = () => {
-        navigate('/chatroom');
+        navigate('/sessionroom');
     };
 
   return (
@@ -15,4 +15,4 @@ function ChatBrowser({user}) {
   )
 }
 
-export default ChatBrowser
+export default SessionBrowser

@@ -95,6 +95,7 @@ class Document(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     session_id = db.Column(db.Integer, db.ForeignKey('sessions.id'))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    title = db.Column(db.String)
     content = db.Column(db.Text)
     verified = db.Column(db.Boolean)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
