@@ -1,10 +1,12 @@
-from config import socket_io, db
+from config import socket_io, db, join_room, leave_room
 from models import ChatMessage, Document, DocumentEditor
+
 
 #CONNECTION
 @socket_io.on('connect')
-def handle_connect():
+def handle_connect(session_id):
     print('new connection')
+    join_room(session_id)
     
 #DISCONNECT
 @socket_io.on("disconnect")

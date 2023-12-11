@@ -4,6 +4,7 @@
 from flask import request, render_template, session, abort
 from flask_restful import Resource
 from dotenv import load_dotenv
+from sqlalchemy.exc import IntegrityError
 
 load_dotenv()
 
@@ -365,7 +366,7 @@ class DocumentEditors(BaseResource):
 api.add_resource(DocumentEditors, '/documenteditors')
 
 # DocumentEditorById: GET, PATCH, DELETE
-class DocumentEditorById(Resource):
+class DocumentEditorById(BaseResource):
     def get(self, id):
         rules = None
         return self.get_item_by_id(model=DocumentEditor, id=id, rules=rules)
@@ -381,7 +382,7 @@ class DocumentEditorById(Resource):
 api.add_resource(DocumentEditorById, '/documenteditors/<int:id>')
 
 # DocumentEditHistory: GET, POST
-class DocumentEditHistories(Resource):
+class DocumentEditHistories(BaseResource):
     def get(self):
         rules = None
         return self.get_items(model=DocumentEditHistory, rules=rules)
@@ -405,7 +406,7 @@ class DocumentEditHistories(Resource):
 api.add_resource(DocumentEditHistories, '/documentedithistories')
 
 # DocumentEditHistoryById: GET, DELETE
-class DocumentEditHistoryById(Resource):
+class DocumentEditHistoryById(BaseResource):
     def get(self, id):
         rules = None
         return self.get_item_by_id(model=DocumentEditHistory, id=id, rules=rules)
@@ -419,13 +420,79 @@ api.add_resource(DocumentEditHistoryById, '/documentedithistories/<int:id>')
 
 ##### AUTH ROUTES #####
 # UserSignUp: POST
+class UserSignUp(BaseResource):
+    def post(self):
+        data = request.get_json()
+        username = data.get('username')
+        name = data.get('name')
+        email = data.get('email')
+        password = data.get('password')
+        customer_name = data.get("customer_name")
+        try:
+            new_user = User(
+                username = username,
+                name = name,
+                email = email,
+                customer_name = customer_name
+                )
+            try:
+                print("Trying hash")
+                new_user.password_hash = password
+                print("Adding user to session...")
+                db.session.add(new_user)
+                print("Commiting session...")
+                print(new_user)
+                db.session.commit()
+
+                session['user_id'] = new_user.id
+
+                return new_user.to_dict(), 200
+            except IntegrityError:
+                return {'error': '422 Unprocessable Entity'}, 422
+        except ValueError as e:
+            print(e.__str__())
+            return {"errors": ["validation errors"]}, 400
+
+api.add_resource(UserSignUp, "/signup")
 
 # CheckSession: GET
+class CheckSession(Resource):
+    def get(self):
+        user_id = session.get('user_id')
+        if user_id:
+            user = User.query.filter(User.id == user_id).first()
+            return user.to_dict(), 200
+        
+        return {}, 401
+
+api.add_resource(CheckSession, "/checksession")
 
 # Login: POST
+class Login(Resource):
+    def post(self):
+        request_json = request.get_json()
+        username = request_json.get('username')
+        email = request_json.get('email')
+        password = request_json.get('password')
+        if email:
+            user = User.query.filter(User.email == email).first()
+        if username:
+            user = User.query.filter(User.username == username).first()
+        if user and user.authenticate(password):
+            session['user_id'] = user.id
+            return user.to_dict(), 200
+        
+        return {'error': '401 Unauthorized'}, 401
+
+api.add_resource(Login, "/login")
 
 # Logout: DELETE
+class Logout(Resource):
+    def delete(self):
+        session['user_id'] = None
+        return {}, 204
 
+api.add_resource(Logout, "/logout")
 
 # ERROR HANDLER
 @app.errorhandler(404)

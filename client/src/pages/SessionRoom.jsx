@@ -33,7 +33,7 @@ function SessionRoom({user}) {
                 console.log(msg);
             });
             }
-      }, [messages, connected, roomNum]);
+      }, [messages, connected]);
     
     
       function sendMessage(sender, message, room){
@@ -57,7 +57,7 @@ function SessionRoom({user}) {
               <ChatBox messages={messages} user={user} addMessage={addMessage} socket={socket} />
               <form onSubmit={(e) => {
                   e.preventDefault()
-                  sendMessage(user, newMessage, roomNum)
+                  sendMessage(user, newMessage)
                   setNewMessage("")
               }}>
                   <label>Message:</label>
