@@ -396,3 +396,31 @@ api.add_resource(DocumentEditHistoryById, '/documentedithistories/<int:id>')
 # Login: POST
 
 # Logout: DELETE
+
+
+
+
+
+
+############ POST BASERESOURCE TEST #################
+
+class BaseResource(Resource):
+    # ... other methods ...
+
+    def post_item(self, model, allowed_fields, rules=None):
+        data = request.get_json()
+        try:
+            # Prepare the data for the new item
+            item_data = {field: data[field] for field in allowed_fields if field in data}
+
+            # Create a new instance of the model
+            new_item = model(**item_data)
+            db.session.add(new_item)
+            db.session.commit()
+
+            # Assuming your model has a to_dict() method that accepts rules
+            return new_item.to_dict(rules=rules) if rules else new_item.to_dict(), 201
+
+        except Exception as e:
+            print(e.__str__())
+            return {"error": f"An error occurred while posting your message"}, 400

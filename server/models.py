@@ -59,8 +59,8 @@ class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=True)
     title = db.Column(db.String(255), nullable=False)
-    scheduled_time = db.Column(db.DateTime)
-    duration = db.Column(db.Interval)
+    scheduled_time = db.Column(db.DateTime, nullable=True)
+    duration = db.Column(db.Interval, nullable=True)
 
     # Relationships
     course = db.relationship('Course', back_populates='sessions')

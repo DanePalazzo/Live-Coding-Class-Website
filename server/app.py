@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
-# Standard library imports
-
-# Remote library imports
+# IMPORTS
 from flask import request, render_template, session, abort
 from flask_restful import Resource
 from dotenv import load_dotenv
@@ -14,6 +12,8 @@ from config import socket_io, app, db, api, os
 
 # Add your model imports
 from models import *
+
+import socket_handlers
 
 app.secret_key = os.getenv('SECRET_KEY')
 
@@ -27,22 +27,22 @@ app.secret_key = os.getenv('SECRET_KEY')
 
 ################################ SOCKETS ################################
 
-#CONNECTION
-@socket_io.on('connect')
-def handle_connect():
-    print('new connection')
+# #CONNECTION
+# @socket_io.on('connect')
+# def handle_connect():
+#     print('new connection')
 
 
-#USER MESSAGE
-@socket_io.on('user-message')
-def chat_message(user_id, session_id, message_txt):
-    print(f"user: {user_id}, session: {session_id}, message: {message_txt}")
-    db.session.add()
+# #USER MESSAGE
+# @socket_io.on('user-message')
+# def chat_message(user_id, session_id, message_txt):
+#     print(f"user: {user_id}, session: {session_id}, message: {message_txt}")
+#     db.session.add()
     
-
-@socket_io.on("disconnect")
-def disconnected():
-    print("user disconnected")
+# #DISCONNECT
+# @socket_io.on("disconnect")
+# def disconnected():
+#     print("user disconnected")
 
 
 ################################ ROUTES ################################
@@ -119,7 +119,21 @@ class Courses(BaseResource):
         return self.get_items(model=Course, rules=rules)
     
     def post(self):
-        pass
+        data = request.get_json()
+        try:
+            new_course = Course(
+                title = data["title"],
+                description = data["description"],
+                instructor_id = data["instructor_id"],
+                start_date = data["start_date"],
+                end_date = data["end_date"]
+            )
+            db.session.add(new_course)
+            db.session.commit()
+            return new_course.to_dict(), 200
+        except Exception as e:
+            print(e.__str__())
+            return {"error": f"An error occurred while posting you message"}, 400
 
 api.add_resource(Courses, '/courses')
 
@@ -146,7 +160,19 @@ class Sessions(BaseResource):
         return self.get_items(model=Session, rules=rules)
     
     def post(self):
-        pass
+        data = request.get_json()
+        try:
+            new_session = Session(
+                course_id = data["course_id"],
+                title = data["title"],
+                scheduled_time = data["scheduled_time"]
+            )
+            db.session.add(new_session)
+            db.session.commit()
+            return new_session.to_dict(), 200
+        except Exception as e:
+            print(e.__str__())
+            return {"error": f"An error occurred while posting you message"}, 400
 
 api.add_resource(Sessions, '/sessions')
 
@@ -174,7 +200,20 @@ class Documents(BaseResource):
         return self.get_items(model=Session, rules=rules)
     
     def post(self):
-        pass
+        data = request.get_json()
+        try:
+            new_document = Document(
+                session_id = data["session_id"],
+                owner_id = data["owner_id"],
+                content = data["content"],
+                verified = data["verified"]
+            )
+            db.session.add(new_document)
+            db.session.commit()
+            return new_document.to_dict(), 200
+        except Exception as e:
+            print(e.__str__())
+            return {"error": f"An error occurred while posting you message"}, 400
 
 api.add_resource(Documents, '/documents')
 
@@ -201,10 +240,21 @@ class ChatMessages(BaseResource):
         return self.get_items(model=ChatMessage, rules=rules)
     
     def post(self):
-        pass
+        data = request.get_json()
+        try:
+            new_chat_message = ChatMessage(
+                user_id = data["user_id"],
+                session_id = data["session_id"],
+                message_text = data["message_text"]
+            )
+            db.session.add(new_chat_message)
+            db.session.commit()
+            return new_chat_message.to_dict(), 200
+        except Exception as e:
+            print(e.__str__())
+            return {"error": f"An error occurred while posting you message"}, 400
 
 api.add_resource(ChatMessages, '/chatmessages')
-
 
 # ChatMessageById: GET, PATCH, DELETE
 class ChatMessageById(Resource):
@@ -231,7 +281,19 @@ class Enrollments(BaseResource):
         return self.get_items(model=Enrollment, rules=rules)
     
     def post(self):
-        pass
+        data = request.get_json()
+        try:
+            new_enrollment = Enrollment(
+                user_id = data["user_id"],
+                course_id = data["course_id"]
+            )
+            db.session.add(new_enrollment)
+            db.session.commit()
+            return new_enrollment.to_dict(), 200
+        except Exception as e:
+            print(e.__str__())
+            return {"error": f"An error occurred while posting you message"}, 400
+
 
 api.add_resource(Enrollments, '/enrollments')
 
@@ -254,7 +316,18 @@ class SessionParticipants(BaseResource):
         return self.get_items(model=SessionParticipant, rules=rules)
     
     def post(self):
-        pass
+        data = request.get_json()
+        try:
+            new_session_participant = SessionParticipant(
+                session_id = data["session_id"],
+                user_id = data["user_id"]
+            )
+            db.session.add(new_session_participant)
+            db.session.commit()
+            return new_session_participant.to_dict(), 200
+        except Exception as e:
+            print(e.__str__())
+            return {"error": f"An error occurred while posting you message"}, 400
 
 api.add_resource(SessionParticipants, '/sessionparticipants')
 
@@ -281,7 +354,19 @@ class DocumentEditors(BaseResource):
         return self.get_items(model=DocumentEditor, rules=rules)
     
     def post(self):
-        pass
+        data = request.get_json()
+        try:
+            new_document_editor = DocumentEditor(
+                document_id = data["document_id"],
+                user_id = data["user_id"],
+                permission_level = data["permission_level"]
+            )
+            db.session.add(new_document_editor)
+            db.session.commit()
+            return new_document_editor.to_dict(), 200
+        except Exception as e:
+            print(e.__str__())
+            return {"error": f"An error occurred while posting you message"}, 400
 
 api.add_resource(DocumentEditors, '/documenteditors')
 
@@ -308,7 +393,19 @@ class DocumentEditHistories(Resource):
         return self.get_items(model=DocumentEditHistory, rules=rules)
     
     def post(self):
-        pass
+        data = request.get_json()
+        try:
+            new_document_edit_history = DocumentEditor(
+                document_id = data["document_id"],
+                user_id = data["user_id"],
+                edit_content = data["edit_content"]
+            )
+            db.session.add(new_document_edit_history)
+            db.session.commit()
+            return new_document_edit_history.to_dict(), 200
+        except Exception as e:
+            print(e.__str__())
+            return {"error": f"An error occurred while posting you message"}, 400
 
 api.add_resource(DocumentEditHistories, '/documentedithistories')
 
