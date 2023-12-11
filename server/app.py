@@ -26,6 +26,9 @@ app.secret_key = os.getenv('SECRET_KEY')
 ################################ SOCKETS ################################
 import socket_handlers
 
+################################ APP FUNCTIONS ################################
+import app_functions
+
 ################################ ROUTES ################################
 
 ##### BaseResource #####
