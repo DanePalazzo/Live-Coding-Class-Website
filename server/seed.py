@@ -42,7 +42,7 @@ def seed_users():
     stephen = User(
         name="Chimmy",
         username= "Bonesaw",
-        email= "bonesaw@gmail.com",
+        email= "Bonesaw@gmail.com",
         role="student"
     )
     stephen.password_hash = stephen_password
@@ -106,6 +106,11 @@ if __name__ == '__main__':
         #     Session.query.delete()
         # except:
         #     print("No Sessions")
+        # try:
+        #     ChatMessage.query.delete()
+        # except:
+        #     print("No Chat Messages")
+
 
         # print("Seeding user...")
         # users = seed_users()

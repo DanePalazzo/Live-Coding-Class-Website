@@ -11,14 +11,14 @@ export default defineConfig({
     cors:true,
     // we write our fetches to /api/route and it will go through this proxy
     // PROXY ONLY WORKS IN DEVELOPMENT AND WONT WORK IN PRODUCTION/DEPLOYED
-    // proxy: {
-    //   "/api":{
-    //     // we can adjust the target based on our backend port
-    //     target: "http://127.0.0.1:5000",
-    //     changeOrigin:true,
-    //     secure: false,
-    //     rewrite: (path)=>path.replace(/^\/api/,"")
-    //   }
-    // }
+    proxy: {
+      "/api":{
+        // we can adjust the target based on our backend port
+        target: "http://127.0.0.1:5555",
+        changeOrigin:true,
+        secure: false,
+        rewrite: (path)=>path.replace(/^\/api/,"")
+      }
+    }
   }
 })

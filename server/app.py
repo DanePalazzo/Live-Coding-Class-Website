@@ -17,11 +17,11 @@ from models import *
 app.secret_key = os.getenv('SECRET_KEY')
 
 #### LOGIN AUTHORIZATION ###
-# @app.before_request
-# def check_if_logged_in():
-#     restricted_access_list = []
-#     if (request.endpoint) in restricted_access_list and (not session.get('user_id')):
-#         return {'error': '401 Unauthorized'}, 401
+@app.before_request
+def check_if_logged_in():
+    restricted_access_list = []
+    if (request.endpoint) in restricted_access_list and (not session.get('user_id')):
+        return {'error': '401 Unauthorized'}, 401
 
 
 ################################ SOCKETS ################################
@@ -117,7 +117,7 @@ class Courses(BaseResource):
             )
             db.session.add(new_course)
             db.session.commit()
-            return new_course.to_dict(), 200
+            return new_course.to_dict(), 201
         except Exception as e:
             db.session.rollback()
             print(e.__str__())
@@ -157,7 +157,7 @@ class Sessions(BaseResource):
             )
             db.session.add(new_session)
             db.session.commit()
-            return new_session.to_dict(), 200
+            return new_session.to_dict(), 201
         except Exception as e:
             db.session.rollback()
             print(e.__str__())
@@ -200,7 +200,7 @@ class Documents(BaseResource):
             )
             db.session.add(new_document)
             db.session.commit()
-            return new_document.to_dict(), 200
+            return new_document.to_dict(), 201
         except Exception as e:
             db.session.rollback()
             print(e.__str__())
@@ -240,7 +240,7 @@ class ChatMessages(BaseResource):
             )
             db.session.add(new_chat_message)
             db.session.commit()
-            return new_chat_message.to_dict(), 200
+            return new_chat_message.to_dict(), 201
         except Exception as e:
             db.session.rollback()
             print(e.__str__())
@@ -269,7 +269,7 @@ api.add_resource(ChatMessageById, '/chatmessages/<int:id>')
 # Enrollments: GET, POST
 class Enrollments(BaseResource):
     def get(self):
-        rules = ("-course.enrollments", )
+        rules = None
         return self.get_items(model=Enrollment, rules=rules)
     
     def post(self):
@@ -281,7 +281,7 @@ class Enrollments(BaseResource):
             )
             db.session.add(new_enrollment)
             db.session.commit()
-            return new_enrollment.to_dict(rules=("-course.enrollments", )), 200
+            return new_enrollment.to_dict(rules=None), 201
         except Exception as e:
             db.session.rollback()
             print(e.__str__())
@@ -293,11 +293,11 @@ api.add_resource(Enrollments, '/enrollments')
 # EnrollmentById: GET, DELETE
 class EnrollmentById(BaseResource):
     def get(self, id):
-        rules = ("-course.enrollments", )
+        rules = None
         return self.get_item_by_id(model=Enrollment, id=id, rules=rules)
         
     def delete(self, id):
-        rules = ("-course.enrollments", )
+        rules = None
         return self.delete_item_by_id(model=Enrollment, id=id, rules=rules)
 
 api.add_resource(EnrollmentById, '/enrollments/<int:id>')
@@ -317,7 +317,7 @@ class SessionParticipants(BaseResource):
             )
             db.session.add(new_session_participant)
             db.session.commit()
-            return new_session_participant.to_dict(), 200
+            return new_session_participant.to_dict(), 201
         except Exception as e:
             db.session.rollback()
             print(e.__str__())
@@ -357,7 +357,7 @@ class DocumentEditors(BaseResource):
             )
             db.session.add(new_document_editor)
             db.session.commit()
-            return new_document_editor.to_dict(), 200
+            return new_document_editor.to_dict(), 201
         except Exception as e:
             db.session.rollback()
             print(e.__str__())
@@ -397,7 +397,7 @@ class DocumentEditHistories(BaseResource):
             )
             db.session.add(new_document_edit_history)
             db.session.commit()
-            return new_document_edit_history.to_dict(), 200
+            return new_document_edit_history.to_dict(), 201
         except Exception as e:
             db.session.rollback()
             print(e.__str__())
@@ -446,7 +446,7 @@ class UserSignUp(BaseResource):
 
                 session['user_id'] = new_user.id
 
-                return new_user.to_dict(), 200
+                return new_user.to_dict(), 201
             except IntegrityError:
                 return {'error': '422 Unprocessable Entity'}, 422
         except ValueError as e:
@@ -475,12 +475,14 @@ class Login(Resource):
         email = data.get('email')
         password = data.get('password')
         if email:
-            user = User.query.filter(User.email == email).first()
+            email_lower = email.lower()
+            user = User.query.filter(User._email == email_lower).first()
         if username:
-            user = User.query.filter(User.username == username).first()
+            username_lower = username.lower()
+            user = User.query.filter(User._username == username_lower).first()
         if user and user.authenticate(password):
             session['user_id'] = user.id
-            return user.to_dict(), 200
+            return user.to_dict(), 201
         
         return {'error': '401 Unauthorized'}, 401
 

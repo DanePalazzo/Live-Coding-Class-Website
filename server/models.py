@@ -12,20 +12,20 @@ from config import db, metadata
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(255), nullable=False)
+    _username = db.Column("username", db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     _password_hash = db.Column(db.String(255), nullable=False)
-    email = db.Column(db.String(255), nullable=False)
+    _email = db.Column("email", db.String(255), nullable=False)
     role = db.Column(db.String(50))
     registration_date = db.Column(db.DateTime, default=datetime.utcnow)
     last_login_date = db.Column(db.DateTime, nullable=True)
 
     # Relationships
     courses_taught = db.relationship('Course', back_populates='instructor')
-    enrollments = db.relationship('Enrollment', back_populates='user')
-    accessible_sessions = db.relationship('SessionParticipant', back_populates='user')
-    documents = db.relationship('Document', back_populates='owner')
-    editor_permissions = db.relationship('DocumentEditor', back_populates='user')
+    enrollments = db.relationship('Enrollment', back_populates='user', cascade="all, delete")
+    accessible_sessions = db.relationship('SessionParticipant', back_populates='user', cascade="all, delete")
+    documents = db.relationship('Document', back_populates='owner', cascade="all, delete-orphan")
+    editor_permissions = db.relationship('DocumentEditor', back_populates='user', cascade="all, delete")
     edits = db.relationship('DocumentEditHistory', back_populates='editor')
     messages = db.relationship('ChatMessage', back_populates='user')
     
@@ -53,6 +53,22 @@ class User(db.Model, SerializerMixin):
 
     def authenticate(self, password):
         return bcrypt.check_password_hash(self._password_hash, password.encode('utf-8'))
+
+    @property
+    def username(self):
+        return self._username
+
+    @username.setter
+    def username(self, username):
+        self._username = username.lower()
+    
+    @property
+    def email(self):
+        return self._email
+
+    @email.setter
+    def email(self, email):
+        self._email = email.lower()
     
 
 
@@ -61,13 +77,13 @@ class Course(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text)
-    instructor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    instructor_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="SET NULL"), nullable=True)
     start_date = db.Column(db.Date)
     end_date = db.Column(db.Date)
 
     # Relationships
     instructor = db.relationship('User', back_populates='courses_taught')
-    sessions = db.relationship('Session', back_populates='course')
+    sessions = db.relationship('Session', back_populates='course', cascade="all, delete")
     enrollments = db.relationship('Enrollment', back_populates='course')
 
     serialize_rules = (
@@ -98,7 +114,7 @@ class Session(db.Model, SerializerMixin):
 
     # Relationships
     course = db.relationship('Course', back_populates='sessions')
-    participants = db.relationship('SessionParticipant', back_populates='session')
+    participants = db.relationship('SessionParticipant', back_populates='session', cascade="all, delete")
     documents = db.relationship('Document', back_populates='session')
     messages = db.relationship('ChatMessage', back_populates='session')
 
@@ -119,7 +135,7 @@ class Enrollment(db.Model, SerializerMixin):
     __tablename__ = 'enrollments'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id', ondelete="SET NULL"), nullable=True)
     enrollment_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -131,6 +147,7 @@ class Enrollment(db.Model, SerializerMixin):
         "-user.documents",
         "-user.editor_permissions",
         "-user.courses_taught"
+        "-course.enrollments"
         )
 
 class SessionParticipant(db.Model, SerializerMixin):
@@ -158,8 +175,8 @@ class SessionParticipant(db.Model, SerializerMixin):
 class Document(db.Model, SerializerMixin):
     __tablename__ = 'documents'
     id = db.Column(db.Integer, primary_key=True)
-    session_id = db.Column(db.Integer, db.ForeignKey('sessions.id'), nullable=True)
-    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    session_id = db.Column(db.Integer, db.ForeignKey('sessions.id', ondelete="SET NULL"), nullable=True)
+    owner_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="SET NULL"), nullable=True)
     title = db.Column(db.String)
     content = db.Column(db.Text)
     verified = db.Column(db.Boolean)
@@ -169,8 +186,8 @@ class Document(db.Model, SerializerMixin):
     # Relationships
     session = db.relationship('Session', back_populates='documents')
     owner = db.relationship('User', back_populates='documents')
-    editors = db.relationship('DocumentEditor', back_populates='document')
-    edits = db.relationship('DocumentEditHistory', back_populates='document')
+    editors = db.relationship('DocumentEditor', back_populates='document', cascade="all, delete")
+    edits = db.relationship('DocumentEditHistory', back_populates='document', cascade="all, delete")
 
     serialize_rules = (
         '-owner',
@@ -200,7 +217,7 @@ class DocumentEditHistory(db.Model, SerializerMixin):
     __tablename__ = 'document_edits_history'
     id = db.Column(db.Integer, primary_key=True)
     document_id = db.Column(db.Integer, db.ForeignKey('documents.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="SET NULL"), nullable=True)
     edit_content = db.Column(db.Text)
     edit_timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -218,9 +235,10 @@ class DocumentEditHistory(db.Model, SerializerMixin):
 class ChatMessage(db.Model, SerializerMixin):
     __tablename__ = 'chat_messages'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    session_id = db.Column(db.Integer, db.ForeignKey('sessions.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="SET NULL"), nullable=True)
+    session_id = db.Column(db.Integer, db.ForeignKey('sessions.id', ondelete="SET NULL"), nullable=True)
     message_text = db.Column(db.Text)
+    edited = db.Column(db.Boolean, default=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
