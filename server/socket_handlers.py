@@ -50,15 +50,17 @@ def document_update(user_id, document_id, edit_content):
         db.session.rollback()
         print(f"An error occurred while updating document: {e}")
 
+#### ADD SOCKET EMMIT FOR CHANGES #####
+
     # Record edit history
-    try:
-        new_document_edit_history = DocumentEditor(
-            document_id=document_id,
-            user_id=user_id,
-            edit_content=edit_content
-        )
-        db.session.add(new_document_edit_history)
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        print(f"An error occurred in recording document edit history: {e}")
+    # try:
+    #     new_document_edit_history = DocumentEditor(
+    #         document_id=document_id,
+    #         user_id=user_id,
+    #         edit_content=edit_content
+    #     )
+    #     db.session.add(new_document_edit_history)
+    #     db.session.commit()
+    # except Exception as e:
+    #     db.session.rollback()
+    #     print(f"An error occurred in recording document edit history: {e}")

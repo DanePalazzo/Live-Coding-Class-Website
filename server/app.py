@@ -25,10 +25,10 @@ app.secret_key = os.getenv('SECRET_KEY')
 
 
 ################################ SOCKETS ################################
-import socket_handlers
+# import socket_handlers
 
 ################################ APP FUNCTIONS ################################
-import app_functions
+# import app_functions
 
 ################################ ROUTES ################################
 
@@ -60,7 +60,7 @@ class BaseResource(Resource):
             print(e.__str__())
             return {"error": f"An error occurred while updating: {model.__name__}"}, 400
 
-    def delete_item_by_id(self, model, id):
+    def delete_item_by_id(self, model, id, rules=None):
         item = model.query.filter_by(id=id).first()
         if not item:
             return {"error": f"{model.__name__} not found"}, 404
@@ -121,7 +121,7 @@ class Courses(BaseResource):
         except Exception as e:
             db.session.rollback()
             print(e.__str__())
-            return {"error": f"An error occurred while posting you message"}, 400
+            return {"error": f"An error occurred while posting your message"}, 400
 
 api.add_resource(Courses, '/courses')
 
@@ -161,7 +161,7 @@ class Sessions(BaseResource):
         except Exception as e:
             db.session.rollback()
             print(e.__str__())
-            return {"error": f"An error occurred while posting you message"}, 400
+            return {"error": f"An error occurred while posting your message"}, 400
 
 api.add_resource(Sessions, '/sessions')
 
@@ -186,7 +186,7 @@ api.add_resource(SessionById, '/sessions/<int:id>')
 class Documents(BaseResource):
     def get(self):
         rules = None
-        return self.get_items(model=Session, rules=rules)
+        return self.get_items(model=Document, rules=rules)
     
     def post(self):
         data = request.get_json()
@@ -204,7 +204,7 @@ class Documents(BaseResource):
         except Exception as e:
             db.session.rollback()
             print(e.__str__())
-            return {"error": f"An error occurred while posting you message"}, 400
+            return {"error": f"An error occurred while posting your message"}, 400
 
 api.add_resource(Documents, '/documents')
 
@@ -222,7 +222,7 @@ class DocumentById(BaseResource):
         rules = None
         return self.delete_item_by_id(model=Document, id=id, rules=rules)
 
-api.add_resource(DocumentById, '/document/<int:id>')
+api.add_resource(DocumentById, '/documents/<int:id>')
 
 # ChatMessages: GET, POST
 class ChatMessages(BaseResource):
@@ -244,12 +244,12 @@ class ChatMessages(BaseResource):
         except Exception as e:
             db.session.rollback()
             print(e.__str__())
-            return {"error": f"An error occurred while posting you message"}, 400
+            return {"error": f"An error occurred while posting your message"}, 400
 
 api.add_resource(ChatMessages, '/chatmessages')
 
 # ChatMessageById: GET, PATCH, DELETE
-class ChatMessageById(Resource):
+class ChatMessageById(BaseResource):
     def get(self, id):
         rules = None
         return self.get_item_by_id(model=ChatMessage, id=id, rules=rules)
@@ -269,7 +269,7 @@ api.add_resource(ChatMessageById, '/chatmessages/<int:id>')
 # Enrollments: GET, POST
 class Enrollments(BaseResource):
     def get(self):
-        rules = None
+        rules = ("-course.enrollments", )
         return self.get_items(model=Enrollment, rules=rules)
     
     def post(self):
@@ -281,11 +281,11 @@ class Enrollments(BaseResource):
             )
             db.session.add(new_enrollment)
             db.session.commit()
-            return new_enrollment.to_dict(), 200
+            return new_enrollment.to_dict(rules=("-course.enrollments", )), 200
         except Exception as e:
             db.session.rollback()
             print(e.__str__())
-            return {"error": f"An error occurred while posting you message"}, 400
+            return {"error": f"An error occurred while posting your message"}, 400
 
 
 api.add_resource(Enrollments, '/enrollments')
@@ -293,11 +293,11 @@ api.add_resource(Enrollments, '/enrollments')
 # EnrollmentById: GET, DELETE
 class EnrollmentById(BaseResource):
     def get(self, id):
-        rules = None
+        rules = ("-course.enrollments", )
         return self.get_item_by_id(model=Enrollment, id=id, rules=rules)
         
     def delete(self, id):
-        rules = None
+        rules = ("-course.enrollments", )
         return self.delete_item_by_id(model=Enrollment, id=id, rules=rules)
 
 api.add_resource(EnrollmentById, '/enrollments/<int:id>')
@@ -321,7 +321,7 @@ class SessionParticipants(BaseResource):
         except Exception as e:
             db.session.rollback()
             print(e.__str__())
-            return {"error": f"An error occurred while posting you message"}, 400
+            return {"error": f"An error occurred while posting your message"}, 400
 
 api.add_resource(SessionParticipants, '/sessionparticipants')
 
@@ -361,7 +361,7 @@ class DocumentEditors(BaseResource):
         except Exception as e:
             db.session.rollback()
             print(e.__str__())
-            return {"error": f"An error occurred while posting you message"}, 400
+            return {"error": f"An error occurred while posting your message"}, 400
 
 api.add_resource(DocumentEditors, '/documenteditors')
 
@@ -390,7 +390,7 @@ class DocumentEditHistories(BaseResource):
     def post(self):
         data = request.get_json()
         try:
-            new_document_edit_history = DocumentEditor(
+            new_document_edit_history = DocumentEditHistory(
                 document_id = data["document_id"],
                 user_id = data["user_id"],
                 edit_content = data["edit_content"]
@@ -401,7 +401,7 @@ class DocumentEditHistories(BaseResource):
         except Exception as e:
             db.session.rollback()
             print(e.__str__())
-            return {"error": f"An error occurred while posting you message"}, 400
+            return {"error": f"An error occurred while posting your message"}, 400
 
 api.add_resource(DocumentEditHistories, '/documentedithistories')
 
@@ -427,13 +427,13 @@ class UserSignUp(BaseResource):
         name = data.get('name')
         email = data.get('email')
         password = data.get('password')
-        customer_name = data.get("customer_name")
+        role = data.get('role')
         try:
             new_user = User(
                 username = username,
                 name = name,
                 email = email,
-                customer_name = customer_name
+                role = role
                 )
             try:
                 print("Trying hash")
@@ -470,10 +470,10 @@ api.add_resource(CheckSession, "/checksession")
 # Login: POST
 class Login(Resource):
     def post(self):
-        request_json = request.get_json()
-        username = request_json.get('username')
-        email = request_json.get('email')
-        password = request_json.get('password')
+        data = request.get_json()
+        username = data.get('username')
+        email = data.get('email')
+        password = data.get('password')
         if email:
             user = User.query.filter(User.email == email).first()
         if username:
