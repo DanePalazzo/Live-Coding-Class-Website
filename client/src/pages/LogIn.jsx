@@ -2,7 +2,6 @@ import { useState, React } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 
-
 function LogIn({ user, setUser }) {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
@@ -10,6 +9,7 @@ function LogIn({ user, setUser }) {
 
   const navigate = useNavigate();
 
+  
   function handleLogIn(e) {
     e.preventDefault()
     let user_info = {
@@ -40,7 +40,7 @@ function LogIn({ user, setUser }) {
 
   return (
       <div>
-          <h2>Login</h2>
+          <h2>Log In</h2>
           <div>
             {showIncorrect && <div><p>Invalid username or password</p></div>}
               <form onSubmit={(e)=>handleLogIn(e)}>
@@ -58,9 +58,9 @@ function LogIn({ user, setUser }) {
                   placeholder='Password'
                   onChange={(e) => setPassword(e.target.value)}
                   ></input>
+                  <button onClick={(e) => handleLogIn(e)} type="submit">Log In</button>
               </form>
           </div>
-          <button onClick={(e) => handleLogIn(e)} type="submit">Sign In</button>
           <button onClick={() => navigate("/signup")}>Sign Up?</button>
       </div>
   )

@@ -12,10 +12,10 @@ from config import db, metadata
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    _username = db.Column("username", db.String(255), nullable=False)
+    _username = db.Column("username", db.String(255), nullable=False, unique=True)
     name = db.Column(db.String(255), nullable=False)
     _password_hash = db.Column(db.String(255), nullable=False)
-    _email = db.Column("email", db.String(255), nullable=False)
+    _email = db.Column("email", db.String(255), nullable=False, unique=True)
     role = db.Column(db.String(50))
     registration_date = db.Column(db.DateTime, default=datetime.utcnow)
     last_login_date = db.Column(db.DateTime, nullable=True)
@@ -34,8 +34,8 @@ class User(db.Model, SerializerMixin):
         "-_password_hash", 
         "-edits", 
         "-messages",
-        "-enrollments.user", 
-        "-accessible_sessions", 
+        "-enrollments.user",
+        "-accessible_sessions.user",
         "-courses_taught.enrollments", 
         "-courses_taught.instructor", 
         "-enrollments.course.instructor", 
@@ -245,7 +245,30 @@ class ChatMessage(db.Model, SerializerMixin):
     user = db.relationship('User', back_populates='messages')
     session = db.relationship('Session', back_populates='messages')
 
-    serialize_rules = (
-        '-user',
-        '-session'
+    serialize_only = (
+        'id',
+        'session_id',
+        'message_text',
+        'edited',
+        'timestamp',
+        'user.username',
+        'user.name'
         )
+    
+
+##### ADD/WORK ON FRIENDS AND DIRECT MESSAGES #####
+
+# class Friendship(db.Model, SerializerMixin):
+#     __tablename__ = 'friendships'
+#     id = db.Column(db.Integer, primary_key=True)
+#     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+#     friend_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+
+#     # Relationships
+#     user = db.relationship('User', foreign_keys=[user_id], back_populates='friendships')
+#     friend = db.relationship('User', foreign_keys=[friend_id], back_populates='friends')
+
+
+# class DirectMessage(db.Model, SerializerMixin):
+#     __tablename__ = 'direct_message'
+#     id = db.Column(db.Integer, primary_key=True)

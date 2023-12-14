@@ -25,7 +25,7 @@ def check_if_logged_in():
 
 
 ################################ SOCKETS ################################
-# import socket_handlers
+import socket_handlers
 
 ################################ APP FUNCTIONS ################################
 # import app_functions
@@ -502,5 +502,7 @@ def not_found(e):
     return render_template("index.html")
 
 if __name__ == '__main__':
-    app.run(port=5555, debug=True)
+    # app.run(port=5555, debug=True)
+    socket_io.run(app, port=5555)
+
 

@@ -25,6 +25,28 @@ function SignUp() {
       setPasswordCompare(pw1 === pw2);
   }
 
+  function handleSignUp(e){
+    e.preventDefault()
+    if(!passwordCompare){
+        alert("Passwords must match");
+        return;
+    }else{
+        let new_user = {
+            username: username,
+            email: email,
+            name: nameOfUser,
+            password: password,
+            role: "student"
+        }
+        fetch("/api/signup", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(new_user)
+        })
+        .then(res => res.json())
+        .then(() => navigate("/login"))
+    }
+}
   
 
   return (
@@ -67,12 +89,10 @@ function SignUp() {
             placeholder='Confirm Password'
             onChange={(e) => { handleSetConfirmPassword(e.target.value) }}
           ></input>
-          <div>
-            {passwordCompare && <p>*Passwords must match.</p>}
-          </div>
+            {!passwordCompare && <p>*Passwords must match.</p>}
+          <button type="submit">Sign Up</button>
         </form>
       </div>
-      <button onClick={(e) => handleSignUp(e)} type="submit">Sign Up</button>
       <button onClick={() => navigate("/login")}>Log In?</button>
     </div>
   )
