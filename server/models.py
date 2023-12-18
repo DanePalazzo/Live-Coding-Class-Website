@@ -38,7 +38,12 @@ class User(db.Model, SerializerMixin):
         "-accessible_sessions.user",
         "-courses_taught.instructor", 
         "-projects.owner",
-        "-project_permissions.user"
+        "-project_permissions.user",
+        "-projects.documents.edits",
+        "-projects.sessions",
+        "-accessible_sessions.session",
+        "-projects.editors.user",
+        "-projects.editors.project"
     )
 
     @hybrid_property
@@ -85,12 +90,20 @@ class Course(db.Model, SerializerMixin):
     sessions = db.relationship('Session', back_populates='course', cascade="all, delete")
     enrollments = db.relationship('Enrollment', back_populates='course')
 
+
     serialize_rules = (
         '-instructor.courses_taught',
         '-instructor.enrollments',
         '-instructor.project_permissions',
+        '-instructor.accessible_sessions',
+        '-instructor.projects',
+        '-instructor.registration_date',
+        '-instructor.last_login_date'
         '-enrollments.user',
-        '-sessions.course'
+        '-sessions.course',
+        '-sessions.messages',
+        '-sessions.projects',
+        '-sessions.participants' #*
     )
 
 class Session(db.Model, SerializerMixin):
@@ -106,13 +119,18 @@ class Session(db.Model, SerializerMixin):
     participants = db.relationship('SessionParticipant', back_populates='session', cascade="all, delete")
     messages = db.relationship('ChatMessage', back_populates='session')
     projects = db.relationship('ProjectSession', back_populates='session')
-    
 
     serialize_rules = (
         '-course.sessions',
+        # '-course.enrollments.course', #comment back in if -course.enrolments gets removed
+        '-course.enrollments',
         '-participants.session',
         '-messages.session',
-        '-projects.session'
+        '-projects.session',
+        '-participants.user.courses_taught',
+        '-participants.user.enrollments',
+        '-participants.user.project_permissions',
+        '-participants.user.projects',
     )
 
 class Enrollment(db.Model, SerializerMixin):
@@ -127,8 +145,15 @@ class Enrollment(db.Model, SerializerMixin):
     course = db.relationship('Course', back_populates='enrollments')
 
     serialize_rules = (
+        "-user.project_permissions",
+        "-user.projects",
+        "-user.accessible_sessions",
+        "-user.registration_date",
+        "-user.last_login_date",
+        "-user.courses_taught",
         "-user.enrollments",
-        "-course.enrollments"
+        "-course.enrollments",
+        "-course.sessions",
     )
 
 class SessionParticipant(db.Model, SerializerMixin):
@@ -143,8 +168,18 @@ class SessionParticipant(db.Model, SerializerMixin):
     user = db.relationship('User', back_populates='accessible_sessions')
 
     serialize_rules = (
-        '-user.accessible_sessions', 
-        '-session.participants'
+        '-user.accessible_sessions',
+        '-user.projects',
+        '-user.enrollments',
+        '-user.project_permissions',
+        '-user.courses_taught',
+        '-user.registration_date',
+        '-user.last_login_date',
+        '-session.participants',
+        '-session.projects',
+        '-session.messages',
+        '-session.duration',
+        '-session.course',
     )
 
 class Project(db.Model, SerializerMixin):
@@ -153,16 +188,21 @@ class Project(db.Model, SerializerMixin):
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, default="")
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    session_id = db.Column(db.Integer, db.ForeignKey('sessions.id'), nullable=True)
 
     # Relationships
     owner = db.relationship('User', back_populates='projects')
-    sessions = db.relationship('ProjectSession', back_populates='project')
+    sessions = db.relationship('ProjectSession', back_populates='project', cascade="all, delete")
     documents = db.relationship('Document', back_populates='project', cascade="all, delete-orphan")
     editors = db.relationship('ProjectEditor', back_populates='project', cascade="all, delete")
 
     serialize_rules = (
         '-owner.projects',
+        '-owner.accessible_sessions',
+        '-owner.project_permissions',
+        '-owner.enrollments',
+        '-owner.registration_date',
+        '-owner.courses_taught',
+        '-owner.last_login_date',
         '-sessions.session',
         '-documents.project',
         '-editors.project'
@@ -180,8 +220,15 @@ class ProjectEditor(db.Model, SerializerMixin):
     user = db.relationship('User', back_populates='project_permissions')
 
     serialize_rules = (
-        '-user',
-        '-project.editors'
+        '-user.project_permissions',
+        '-user.accessible_sessions',
+        '-user.registration_date',
+        '-user.courses_taught',
+        '-user.enrollments',
+        '-user.last_login_date',
+        '-user.projects',
+        '-project.editors',
+        '-project.documents.edits'
     )
 
 
@@ -191,7 +238,6 @@ class Document(db.Model, SerializerMixin):
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'), nullable=False)
     title = db.Column(db.String)
     content = db.Column(db.Text)
-    verified = db.Column(db.Boolean)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime)
 
@@ -205,7 +251,7 @@ class Document(db.Model, SerializerMixin):
         '-editors.document',
         '-edits.document',
         '-project.documents',
-        '-project.session',
+        '-project.sessions',
         )
 
 
@@ -252,33 +298,43 @@ class ChatMessage(db.Model, SerializerMixin):
 class ProjectSession(db.Model, SerializerMixin):
     __tablename__ = 'project_sessions'
     id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey('users.id', cascade="all, delete"), nullable=True)
-    session_id = db.Column(db.Integer, db.ForeignKey('users.id', cascade="all, delete"), nullable=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('projects.id'), nullable=True)
+    session_id = db.Column(db.Integer, db.ForeignKey('sessions.id'), nullable=True)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
     project = db.relationship('Project', back_populates='sessions')
     session = db.relationship('Session', back_populates='projects')
 
-    serialize_only = (
-        'id',
-        'project_id',
-        'session_id',
-        'updated_at',
-        'project.title',
-        'project.description',
-        'project.user.id',
-        'project.user.username',
-        'project.user.name',
-        'session.title',
-        'session.id',
-        'session.scheduled_time',
-        'session.course.title',
-        'session.course.id',
-        'session.participants.id',
-        'session.participants.username',
-        'session.participants.name',
-        )
+    serialize_rules = (
+        '-project.sessions',
+        '-project.editors',
+        '-project.documents',
+        '-session.projects',
+        '-session.messages',
+        '-session.participants',
+        '-session.course',
+    )
+
+    # serialize_only = (
+    #     'id',
+    #     'project_id',
+    #     'session_id',
+    #     'updated_at',
+    #     'project.title',
+    #     'project.description',
+    #     # 'project.user.id',
+    #     # 'project.user.username',
+    #     # 'project.user.name',
+    #     'session.title',
+    #     'session.id',
+    #     'session.scheduled_time',
+    #     'session.course.title',
+    #     'session.course.id',
+    #     # 'session.participants.id',
+    #     # 'session.participants.username',
+    #     # 'session.participants.name',
+    #     )
 
 ##### ADD/WORK ON FRIENDS AND DIRECT MESSAGES LATRER #####
 
