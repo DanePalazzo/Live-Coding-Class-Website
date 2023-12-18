@@ -6,6 +6,7 @@ function Message({message, user}) {
     <div>
         <p>{message.user.name}:</p>
         <p>{message.message_text}</p>
+        <button>DELETE</button>
     </div>
   )
 }

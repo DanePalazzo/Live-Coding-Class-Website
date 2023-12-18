@@ -1,5 +1,5 @@
 from config import socket_io, db, join_room, leave_room
-from models import ChatMessage, Document, DocumentEditor, Session
+from models import ChatMessage, Document, Session
 
 
 #CONNECTION

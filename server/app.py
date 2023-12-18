@@ -182,6 +182,47 @@ class SessionById(BaseResource):
 
 api.add_resource(SessionById, '/sessions/<int:id>')
 
+# Projects: GET, POST
+class Projects(BaseResource):
+    def get(self):
+        rules = None
+        return self.get_items(model=Project, rules=rules)
+    
+    def post(self):
+        data = request.get_json()
+        try:
+            new_project = Project(
+                title=data["title"],
+                description=data["description"],
+                owner_id=data["owner_id"],
+                session_id=data["session_id"]
+            )
+            db.session.add(new_project)
+            db.session.commit()
+            return new_project.to_dict(), 201
+        except Exception as e:
+            db.session.rollback()
+            print(e.__str__())
+            return {"error": f"An error occurred while posting your message"}, 400
+
+api.add_resource(Projects, '/projects')
+
+# ProjectById: GET, PATCH, DELETE
+class ProjectById(BaseResource):
+    def get(self, id):
+        rules = None
+        return self.get_item_by_id(model=Project, id=id, rules=rules)
+    
+    def patch(self, id):
+        rules = None
+        return self.patch_item_by_id(model=Project, id=id, rules=rules)
+        
+    def delete(self, id):
+        rules = None
+        return self.delete_item_by_id(model=Project, id=id, rules=rules)
+
+api.add_resource(ProjectById, '/projects/<int:id>')
+
 # Documents: GET, POST
 class Documents(BaseResource):
     def get(self):
@@ -194,6 +235,7 @@ class Documents(BaseResource):
             new_document = Document(
                 session_id = data["session_id"],
                 owner_id = data["owner_id"],
+                project_id = data["project_id"],
                 title = data["title"],
                 content = data["content"],
                 verified = data["verified"]
@@ -341,45 +383,85 @@ class SessionParticipantById(BaseResource):
 
 api.add_resource(SessionParticipantById, '/sessionparticipants/<int:id>')
 
-# DocumentEditors: GET, POST
-class DocumentEditors(BaseResource):
+# ProjectEditors: GET, POST
+class ProjectEditors(BaseResource):
     def get(self):
         rules = None
-        return self.get_items(model=DocumentEditor, rules=rules)
+        return self.get_items(model=ProjectEditor, rules=rules)
     
     def post(self):
         data = request.get_json()
         try:
-            new_document_editor = DocumentEditor(
-                document_id = data["document_id"],
-                user_id = data["user_id"],
+            new_project = ProjectEditor(
+                project_id=data["project_id"],
+                user_id=data["user_id"],
                 permission_level = data["permission_level"]
             )
-            db.session.add(new_document_editor)
+            db.session.add(new_project)
             db.session.commit()
-            return new_document_editor.to_dict(), 201
+            return new_project.to_dict(), 201
         except Exception as e:
             db.session.rollback()
             print(e.__str__())
             return {"error": f"An error occurred while posting your message"}, 400
 
-api.add_resource(DocumentEditors, '/documenteditors')
+api.add_resource(ProjectEditors, '/projecteditors')
 
-# DocumentEditorById: GET, PATCH, DELETE
-class DocumentEditorById(BaseResource):
+# ProjectEditorsById: GET, PATCH, DELETE
+class ProjectEditorById(BaseResource):
     def get(self, id):
         rules = None
-        return self.get_item_by_id(model=DocumentEditor, id=id, rules=rules)
+        return self.get_item_by_id(model=ProjectEditor, id=id, rules=rules)
     
     def patch(self, id):
         rules = None
-        return self.patch_item_by_id(model=DocumentEditor, id=id, rules=rules)
+        return self.patch_item_by_id(model=ProjectEditor, id=id, rules=rules)
         
     def delete(self, id):
         rules = None
-        return self.delete_item_by_id(model=DocumentEditor, id=id, rules=rules)
+        return self.delete_item_by_id(model=ProjectEditor, id=id, rules=rules)
 
-api.add_resource(DocumentEditorById, '/documenteditors/<int:id>')
+api.add_resource(ProjectEditorById, '/projecteditors/<int:id>')
+
+# # DocumentEditors: GET, POST
+# class DocumentEditors(BaseResource):
+#     def get(self):
+#         rules = None
+#         return self.get_items(model=DocumentEditor, rules=rules)
+    
+#     def post(self):
+#         data = request.get_json()
+#         try:
+#             new_document_editor = DocumentEditor(
+#                 document_id = data["document_id"],
+#                 user_id = data["user_id"],
+#                 permission_level = data["permission_level"]
+#             )
+#             db.session.add(new_document_editor)
+#             db.session.commit()
+#             return new_document_editor.to_dict(), 201
+#         except Exception as e:
+#             db.session.rollback()
+#             print(e.__str__())
+#             return {"error": f"An error occurred while posting your message"}, 400
+
+# api.add_resource(DocumentEditors, '/documenteditors')
+
+# # DocumentEditorById: GET, PATCH, DELETE
+# class DocumentEditorById(BaseResource):
+#     def get(self, id):
+#         rules = None
+#         return self.get_item_by_id(model=DocumentEditor, id=id, rules=rules)
+    
+#     def patch(self, id):
+#         rules = None
+#         return self.patch_item_by_id(model=DocumentEditor, id=id, rules=rules)
+        
+#     def delete(self, id):
+#         rules = None
+#         return self.delete_item_by_id(model=DocumentEditor, id=id, rules=rules)
+
+# api.add_resource(DocumentEditorById, '/documenteditors/<int:id>')
 
 # DocumentEditHistory: GET, POST
 class DocumentEditHistories(BaseResource):
