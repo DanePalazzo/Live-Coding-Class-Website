@@ -1,5 +1,5 @@
-from config import socket_io, db, join_room, leave_room
-from models import ChatMessage, Document, Session
+from config import request, socket_io, db, join_room, leave_room
+from models import ChatMessage, Document, Session, Project
 
 
 #CONNECTION
@@ -47,6 +47,7 @@ def user_message(user_id, session_id, message_txt):
         db.session.rollback()
         print(f"Error saving message: {e}")
 
+
 #EDIT MESSAGE
 @socket_io.on('edit_message')
 def edit_message(user_id, chat_id, session_id, new_message_txt):
@@ -63,6 +64,25 @@ def edit_message(user_id, chat_id, session_id, new_message_txt):
         db.session.rollback()
         print(f"Error saving message: {e}")
 
+#FETCHES PROJECTS
+@socket_io.on('session_projects_request')
+def get_session_projects(session_id):
+    print(f"Recieved session_projects_request from session_id: {session_id}")
+    session = Session.query.filter_by(id=session_id).first()
+    projects = [project.to_dict() for project in session.projects]
+    print(projects)
+    socket_io.emit('session_projects_fetched', projects, room=session_id)
+
+#FETCHES FOR ACTIVE PROJECT
+@socket_io.on('active_project_request')
+def project_fetch(project_id, session_id):
+    print(f"Recieved active_project_request from session_id: {session_id}")
+    project = Project.query.filter_by(id=project_id).first()
+    # Get the client's unique session ID
+    client_session_id = request.sid
+    print(project.to_dict())
+    socket_io.emit('active_projects_fetched', project.to_dict(), room=client_session_id)
+
 #DOCUMENT UPDATE
 @socket_io.on('document_update')
 def document_update(user_id, session_id, document_id, edit_content):
@@ -74,9 +94,7 @@ def document_update(user_id, session_id, document_id, edit_content):
         print(f"Document with id:{document_id} not found")
         return
     try:
-        for key, value in edit_content.items():
-            if hasattr(document, key):
-                setattr(document, key, value)
+        setattr(document, "content", edit_content)
         db.session.commit()
         socket_io.emit('document_change', {"user_id": user_id, "document_id": document_id, "edited_content": edit_content}, room=session_id)
     except Exception as e:

@@ -41,7 +41,7 @@ class User(db.Model, SerializerMixin):
         "-project_permissions.user",
         "-projects.documents.edits",
         "-projects.sessions",
-        "-accessible_sessions.session",
+
         "-projects.editors.user",
         "-projects.editors.project"
     )

@@ -1,4 +1,4 @@
-from models import SessionParticipant, Enrollment
+from models import SessionParticipant, Enrollment, Session
 from config import db
 
 def enter_chat_room(user_id, session_id):
@@ -27,3 +27,4 @@ def enroll_user_in_course(user_id, course_id):
         db.session.add(participant)
 
     db.session.commit()
+
