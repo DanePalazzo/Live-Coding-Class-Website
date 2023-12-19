@@ -30,7 +30,7 @@ function App() {
     createRoutesFromElements(
       <Route path="/" element={<NavLayout user={user} setUser={setUser}/>}>
         <Route path="/" element={<Home user={user}/>} />
-        <Route path="sessionsbrowser" element={<SessionsBrowser user={user} sessionId={sessionId} setSessionId={setSessionId}/>} />
+        <Route path="sessionsbrowser" element={<SessionsBrowser user={user} setUser={setUser} sessionId={sessionId} setSessionId={setSessionId}/>} />
         <Route path="login" element={<LogIn user={user} setUser={setUser}/>} />
         <Route path="signup" element={<SignUp user={user}/>} />
         <Route path="sessionroom" element={<SessionRoom user={user} sessionId={sessionId} setSessionId={setSessionId}/>} />

@@ -5,9 +5,9 @@ function ProjectSelector({ userProjects, sessionProjects, user, sessionId, socke
 
     console.log(sessionProjects)
 
-    let mappedUserProjects = userProjects.length !== 0 ? userProjects.map((project)=> <ProjectCard key={project.id} project={project} owner={user.name} sessionId={sessionId} socket={socket}/>) : <h3>You have no projects. Create a project to see them here!</h3>
+    let mappedUserProjects = userProjects.length !== 0 ? userProjects.map((project)=> <ProjectCard key={project.id} project={project} owner={user.name} sessionId={sessionId} socket={socket} sessionProjects={sessionProjects}/>) : <h3>You have no projects. Create a project to see them here!</h3>
 
-    let mappedSessionProjects = sessionProjects.length !== 0 ? sessionProjects.map((project)=> <ProjectCard key={project.id} project={project.project} owner={project.project.owner.name} sessionId={sessionId} socket={socket}/>) : <h3>No project have been shared with this sessions available. Add a project to the session to see it here!</h3>
+    let mappedSessionProjects = sessionProjects.length !== 0 ? sessionProjects.map((project)=> <ProjectCard key={project.id} project={project.project} owner={project.project.owner.name} sessionId={sessionId} socket={socket} sessionProjects={sessionProjects}/>) : <h3>No project have been shared with this sessions available. Add a project to the session to see it here!</h3>
 
     return (
         <div>

@@ -112,7 +112,6 @@ class Session(db.Model, SerializerMixin):
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=True)
     title = db.Column(db.String(255), nullable=False)
     scheduled_time = db.Column(db.DateTime, nullable=True)
-    duration = db.Column(db.String, nullable=True)
 
     # Relationships
     course = db.relationship('Course', back_populates='sessions')
@@ -293,6 +292,7 @@ class ChatMessage(db.Model, SerializerMixin):
         'edited',
         'timestamp',
         'user.username',
+        'user.id',
         'user.name'
         )
     

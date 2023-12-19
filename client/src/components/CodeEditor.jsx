@@ -8,8 +8,8 @@ function CodeEditor({ sessionId, connected, socket, user, activeProject /*codeVa
     const [currentDocument, setCurrentDocument] = useState(null)
     const editorRef = useRef(null)
 
-    console.log(activeProject)
-    console.log(currentDocument)
+    // console.log(activeProject)
+    // console.log(currentDocument)
 
     useEffect(()=>{
         if(currentDocument){
@@ -62,7 +62,7 @@ function CodeEditor({ sessionId, connected, socket, user, activeProject /*codeVa
     useEffect(() => {
         if (connected) {
             socket.on('document_change', (serverMessage) => {
-                console.log(`Document CHanged: ${serverMessage}`)
+                console.log(`Document Changed: ${serverMessage}`)
                 setCodeValue(serverMessage.edit_content)
             })
         }
@@ -87,7 +87,7 @@ function CodeEditor({ sessionId, connected, socket, user, activeProject /*codeVa
                     language={currentDocument ? currentDocument.language : ""}
                     value={codeValue}
                 />
-                : <h4>Select A documnet</h4>}
+                : <h4>Select a Documnet</h4>}
             </div>
         </div>
     )

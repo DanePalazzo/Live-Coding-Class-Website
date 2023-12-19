@@ -10,6 +10,7 @@ function Explorer({ activeProject, currentDocument, setCurrentDocument}) {
         <div>
             <h2>Explorer</h2>
             <div>{mappedDocuments}</div>
+            <button>Create Document</button>
         </div>
     )
 }

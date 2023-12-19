@@ -152,8 +152,7 @@ class Sessions(BaseResource):
         try:
             new_session = Session(
                 course_id = data["course_id"],
-                title = data["title"],
-                scheduled_time = data["scheduled_time"]
+                title = data["title"]
             )
             db.session.add(new_session)
             db.session.commit()

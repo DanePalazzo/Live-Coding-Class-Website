@@ -1,7 +1,7 @@
 import { React, useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
-import ChatBox from '../components/ChatBox'
+import Chat from '../components/Chat'
 import Document from '../components/Document';
 import CodeEditor from '../components/CodeEditor'
 import ProjectSelector from '../components/ProjectSelector'
@@ -24,15 +24,13 @@ function SessionRoom({ user, sessionId, setSessionId }) {
 
     //States
     const [messages, setMessages] = useState([])
-    const [newMessage, setNewMessage] = useState("script.py")
     const [connected, setConnected] = useState(false)
     const [userProjects, setUserProjects] = useState([])
     const [sessionProjects, setSessionProjects] = useState([])
     const [activeProjects, setActiveProjects] = useState([])
-    const [codeValue1, setCodeValue1] = useState("Initial content for editor 1");
-    const [codeValue2, setCodeValue2] = useState("Initial content for editor 2");
 
-    console.log(userProjects)
+
+    // console.log(userProjects)
 
     //socket connect
     useEffect(() => {
@@ -84,34 +82,6 @@ function SessionRoom({ user, sessionId, setSessionId }) {
         }
     }, [connected]);
 
-    //Return of single new message from server
-    useEffect(() => {
-        if (connected) {
-            socket.on('new_message', (serverMessage) => {
-                console.log("new_message:")
-                console.log(messages)
-                console.log(serverMessage)
-                let updatedMessages = [...messages]
-                updatedMessages = [...updatedMessages, serverMessage]
-                // console.log(updatedMessages)
-                setMessages(updatedMessages)
-            })
-        }
-        return () => {
-            if (socket) {
-                socket.removeListener('new_message', (msg) => {console.log(msg); });
-            }
-        }
-    }, [messages, connected]);
-
-    //Handels the message emit to the socket
-    function handleSendMessage(e, user_id = user.id, session_id = sessionId, message_txt = newMessage) {
-        e.preventDefault()
-        console.log(`Sent Message: ${message_txt}`)
-        socket.emit('user_message', user_id, session_id, message_txt)
-        setNewMessage("")
-    }
-
     //Active Project Setter
     useEffect(() => {
         if (connected) {
@@ -131,11 +101,30 @@ function SessionRoom({ user, sessionId, setSessionId }) {
         }
     }, [activeProjects, connected]);
 
+    //Project Added To Session WIP ************************************************************************************
+    useEffect(()=> {
+        if (connected) {
+            socket.on('project_added_to_session', (serverMessage) => {
+                console.log("project_added_to_session")
+                console.log(messages)
+                console.log(serverMessage)
+                let updatedActiveProjects = [...activeProjects]
+                updatedActiveProjects = [...updatedActiveProjects, serverMessage]
+                setActiveProjects(updatedActiveProjects)
+            })
+        }
+        return () => {
+            if (socket) {
+                socket.removeListener('project_added_to_session', (msg) => {console.log(msg); });
+            }
+        }
+    }, [])
 
     console.log(activeProjects)
 
     // let mappedActiveProject = activeProjects.map((activeProject) => <h4>{activeProject.title}</h4>)
 
+    //Code Editor Map
     let mappedActiveProjects = activeProjects.length !== 0 ? activeProjects.map((activeProject) => {
         console.log(activeProject.id)
         return <CodeEditor sessionId={sessionId} connected={connected} socket={socket} user={user} activeProject={activeProject}/>
@@ -146,38 +135,14 @@ function SessionRoom({ user, sessionId, setSessionId }) {
             <div>
                 <h1>Session</h1>
             </div>
-            <div >
+            <div>
                 <ProjectSelector userProjects={userProjects} sessionProjects={sessionProjects} user={user} sessionId={sessionId} socket={socket}/>
             </div>
             <div className="code1">
                 {mappedActiveProjects}
             </div>
-            {/* <div classname="code1">
-                <CodeEditor 
-                    sessionId={sessionId} 
-                    connected={connected} 
-                    socket={socket} 
-                    user={user}
-                    // codeValue={codeValue1}
-                    // setCodeValue={setCodeValue1}
-                />
-            </div>
-            <div classname="code2">
-                <CodeEditor 
-                    sessionId={sessionId} 
-                    connected={connected} 
-                    socket={socket} 
-                    user={user}
-                    // codeValue={codeValue2}
-                    // setCodeValue={setCodeValue2}
-                />
-            </div> */}
             <div>
-                <ChatBox messages={messages} user={user} socket={socket} sessionId={sessionId}/>
-                <form onSubmit={e => handleSendMessage(e)}>
-                    <label>Message:</label>
-                    <input onChange={(e) => setNewMessage(e.target.value)} value={newMessage} />
-                </form>
+                <Chat messages={messages} user={user} socket={socket} sessionId={sessionId} connected={connected} setMessages={setMessages}/>
             </div>
         </>
 
