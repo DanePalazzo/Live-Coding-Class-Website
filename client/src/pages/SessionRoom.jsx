@@ -13,12 +13,14 @@ let socket
 function SessionRoom({ user, sessionId, setSessionId }) {
     //Checks if we have a user or session before running the page
     const navigate = useNavigate()
-    if(!user){
-        navigate('/login')
-    }
-    if(!sessionId){
-        navigate('/sessionsbrowser')
-    }
+    useEffect(() => {
+        if(!user){
+            navigate('/login')
+        }
+        if(!sessionId){
+            navigate('/sessionsbrowser')
+        }
+    }, []);
 
     //States
     const [messages, setMessages] = useState([])
@@ -34,13 +36,17 @@ function SessionRoom({ user, sessionId, setSessionId }) {
 
     //socket connect
     useEffect(() => {
-        socket = io('ws://localhost:5555');
-        setConnected(true)
-        setUserProjects(user.projects)
-        return () => {
-            socket.off('disconnected', (msg) => {console.log(msg);});
+        if(user && user.projects){
+            socket = io('ws://localhost:5555');
+            setConnected(true)
+            setUserProjects(user.projects)
         }
-    }, []);
+        return () => {
+            if (socket) {
+            socket.off('disconnected', (msg) => {console.log(msg);});
+            }
+        }
+    }, [user]);
 
 
     function handleMessagesRequest(){
@@ -71,8 +77,10 @@ function SessionRoom({ user, sessionId, setSessionId }) {
             handleMessagesRequest()
         }
         return () => {
-            socket.removeListener('messages_fetched', (msg) => { console.log(msg);});
-            socket.removeListener('session_projects_fetched', (msg) => { console.log(msg);});
+            if (socket) {
+                socket.removeListener('messages_fetched', (msg) => { console.log(msg);});
+                socket.removeListener('session_projects_fetched', (msg) => { console.log(msg);});
+            }
         }
     }, [connected]);
 
@@ -90,7 +98,9 @@ function SessionRoom({ user, sessionId, setSessionId }) {
             })
         }
         return () => {
-            socket.removeListener('new_message', (msg) => {console.log(msg); });
+            if (socket) {
+                socket.removeListener('new_message', (msg) => {console.log(msg); });
+            }
         }
     }, [messages, connected]);
 
@@ -115,34 +125,41 @@ function SessionRoom({ user, sessionId, setSessionId }) {
             })
         }
         return () => {
-            socket.removeListener('active_projects_fetched', (msg) => {console.log(msg); });
+            if (socket) {
+                socket.removeListener('active_projects_fetched', (msg) => {console.log(msg); });
+            }
         }
     }, [activeProjects, connected]);
 
 
     console.log(activeProjects)
 
-    let mappedActiveProject = activeProjects.map((activeProject) => <h4>{activeProject.title}</h4>)
+    // let mappedActiveProject = activeProjects.map((activeProject) => <h4>{activeProject.title}</h4>)
+
+    let mappedActiveProjects = activeProjects.length !== 0 ? activeProjects.map((activeProject) => {
+        console.log(activeProject.id)
+        return <CodeEditor sessionId={sessionId} connected={connected} socket={socket} user={user} activeProject={activeProject}/>
+        }): <h2>No Active Projects</h2>
 
     return (
         <>
             <div>
                 <h1>Session</h1>
             </div>
-            <div>
+            <div >
                 <ProjectSelector userProjects={userProjects} sessionProjects={sessionProjects} user={user} sessionId={sessionId} socket={socket}/>
             </div>
-            <div>
-                {mappedActiveProject}
+            <div className="code1">
+                {mappedActiveProjects}
             </div>
-            <div classname="code1">
+            {/* <div classname="code1">
                 <CodeEditor 
                     sessionId={sessionId} 
                     connected={connected} 
                     socket={socket} 
                     user={user}
-                    codeValue={codeValue1}
-                    setCodeValue={setCodeValue1}
+                    // codeValue={codeValue1}
+                    // setCodeValue={setCodeValue1}
                 />
             </div>
             <div classname="code2">
@@ -151,10 +168,10 @@ function SessionRoom({ user, sessionId, setSessionId }) {
                     connected={connected} 
                     socket={socket} 
                     user={user}
-                    codeValue={codeValue2}
-                    setCodeValue={setCodeValue2}
+                    // codeValue={codeValue2}
+                    // setCodeValue={setCodeValue2}
                 />
-            </div>
+            </div> */}
             <div>
                 <ChatBox messages={messages} user={user} socket={socket} sessionId={sessionId}/>
                 <form onSubmit={e => handleSendMessage(e)}>

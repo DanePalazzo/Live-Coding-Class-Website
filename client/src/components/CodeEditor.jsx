@@ -3,11 +3,18 @@ import { io } from 'socket.io-client';
 import Editor from '@monaco-editor/react'
 import Explorer from './Explorer';
 
-function CodeEditor({ sessionId, connected, socket, user, codeValue, setCodeValue /*fileName*/ }) {
-    const [currentCodeValue, setCurrentCodeValue] = useState("")
+function CodeEditor({ sessionId, connected, socket, user, activeProject /*codeValue, setCodeValue /*fileName*/ }) {
+    const [codeValue, setCodeValue] = useState("")
     // monaco testing state
     const [fileName, setFileName] = useState("script.py")
+    const [documentId, setDocumentId] = useState(9)
+    const [currentDocument, setCurrentDocument] = useState([])
     const editorRef = useRef(null)
+
+    console.log(activeProject)
+    console.log(currentDocument)
+
+
 
     //monaco testing
     const files = {
@@ -36,7 +43,8 @@ function CodeEditor({ sessionId, connected, socket, user, codeValue, setCodeValu
         return editorRef.current.getValue();
     }
 
-    function emitUpdateDocument(user_id = user.id, session_id = sessionId, document_id = 9, edit_content = codeValue) {
+    function emitUpdateDocument(user_id, session_id, document_id, edit_content) {
+        console.log(`document_id: ${document_id} session_id: ${session_id} edit_content: ${edit_content}` )
         console.log(`Sent Message: ${edit_content}`)
         socket.emit('document_update', user_id, session_id, document_id, edit_content)
     }
@@ -44,24 +52,24 @@ function CodeEditor({ sessionId, connected, socket, user, codeValue, setCodeValu
     function handleCodeChange() {
         const newValue = getEditorValue();
         setCodeValue(newValue); // Update state
-        emitUpdateDocument(user.id, sessionId, newValue); // Emit the update with the new value
+        emitUpdateDocument(user.id, sessionId, documentId, newValue); // Emit the update with the new value
     }
 
     //Return of single new message from server
     useEffect(() => {
         if (connected) {
             socket.on('document_change', (serverMessage) => {
-                // console.log(serverMessage)
-                setCodeValue(serverMessage)
+                console.log(serverMessage)
+                setCodeValue(serverMessage.edit_content)
             })
         }
-    }, [/*currentCodeValue,*/ connected]);
-
-
-    let mappedDocuments
+    }, [connected]);
 
     return (
         <div>
+            <div>
+                <Explorer activeProject={activeProject} currentDocument={currentDocument} setCurrentDocument={setCurrentDocument}/>
+            </div>
             <div className='code_editor'>
                 <Editor
                     onChange={handleCodeChange}
@@ -69,13 +77,11 @@ function CodeEditor({ sessionId, connected, socket, user, codeValue, setCodeValu
                     width="100%"
                     theme='vs-dark'
                     onMount={handleEditorDidMount}
-                    path={file.name}
-                    defaultLanguage={file.language}
-                    value={currentCodeValue}
+                    path={currentDocument.title}
+                    defaultLanguage="python"
+                    // language={currentDocument.language}
+                    value={codeValue}
                 />
-            </div>
-            <div>
-                <Explorer/>
             </div>
         </div>
     )
