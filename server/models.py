@@ -238,6 +238,7 @@ class Document(db.Model, SerializerMixin):
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'), nullable=False)
     title = db.Column(db.String)
     content = db.Column(db.Text)
+    language = db.Column(db.String, default="javascript", nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime)
 

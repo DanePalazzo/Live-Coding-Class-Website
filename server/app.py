@@ -234,6 +234,7 @@ class Documents(BaseResource):
             new_document = Document(
                 project_id = data["project_id"],
                 title = data["title"],
+                language = data["language"],
                 content = data["content"]
             )
             db.session.add(new_document)
