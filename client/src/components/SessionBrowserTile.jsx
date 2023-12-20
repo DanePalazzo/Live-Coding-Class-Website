@@ -5,6 +5,7 @@ function SessionBrowserTile({user, setUser, session, setSessionId}) {
   const [sessionTitle, setSessionTitle] = useState("")
   const [scheduledTime, setScheduledTime] = useState("")
   const [sessionOptionId, setSessionOptionId] = useState(null)
+  const [sessionDescription, setSessionDescription] = useState("")
 
   const navigate = useNavigate();
 
@@ -12,6 +13,7 @@ function SessionBrowserTile({user, setUser, session, setSessionId}) {
   useEffect(()=>{
     setSessionTitle(session.session.title)
     setSessionOptionId(session.session.id)
+    setSessionDescription(session.session.description)
     setScheduledTime(session.session.scheduled_time)
   }, [])
 
@@ -39,12 +41,37 @@ function SessionBrowserTile({user, setUser, session, setSessionId}) {
     }
 }
 
-  return (
+
+  let removeSessionModal = 
     <div>
-      <h2>{sessionTitle}</h2>
-      <button onClick={handleJoinSession}>Join</button>
-      <button onClick={handleDeleteProjectParticipant}>REMOVE SESSION</button>
+      <button className="btn btn-sm btn-outline btn-error" onClick={() => document.getElementById('remove_session_modal').showModal()}>REMOVE</button>
+      <dialog id="remove_session_modal" className="modal">
+        <div className="modal-box bg-[#111111]">
+          <form method="dialog">
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+          </form>
+          <h3 className="font-bold text-lg">Are you sure you would like to leave:</h3>
+          <p className="py-4">{sessionTitle}?</p>
+          <div>
+            <button className="btn btn-outline btn-error"onClick={handleDeleteProjectParticipant}>PERMANENTLY LEAVE: {sessionTitle}</button>
+          </div>
+        </div>
+      </dialog>
     </div>
+
+  return (
+      <div className="card w-96 bg-[#111111] shadow-xl">
+        <div className="card-body">
+          <div className='flex flex-row justify-between'>
+            <h2 className="card-title">{sessionTitle}</h2>
+            {removeSessionModal}
+          </div>
+          <p className='text-left'>{sessionDescription}</p>
+          <div className="card-actions justify-end">
+            <button className="btn btn-outline btn-block btn-accent" onClick={handleJoinSession}>Join</button>
+          </div>
+        </div>
+      </div>
   )
 }
 

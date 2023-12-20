@@ -1,23 +1,21 @@
 import {React, useState, useEffect} from 'react'
 
 function CreateNewProject({user, socket, sessionId}) {
-    const [newProjectName, setNewProjectName] = useState("")
+    const [newProjectTitle, setNewProjectTitle] = useState("")
     const [newProjectDesciption, setNewProjectDesciption] = useState("")
 
-    useEffect(()=>{
-        socket.on("new_project_fetched")
-    })
-
-    function handleCreateNewProject(){
-        
+    function handleCreateNewProject(e){
+        e.preventDefault()
+        socket.emit('create_new_project_in_session', user.id, sessionId, newProjectTitle, newProjectDesciption)
     }
 
     return (
         <div>
             <h2>CreateNewProject</h2>
-            <form onSubmit={e => handleSendMessage(e)}>
-                <label>Message:</label>
-                <input onChange={(e) => setNewProjectName(e.target.value)} value={newProjectName} />
+            <form onSubmit={e => handleCreateNewProject(e)}>
+                <label>Title:</label>
+                <input onChange={(e) => setNewProjectTitle(e.target.value)} value={newProjectTitle} />
+                <label>Description:</label>
                 <input onChange={(e) => setNewProjectDesciption(e.target.value)} value={newProjectDesciption} />
                 <button type="submit">CREATE</button>
             </form>

@@ -55,12 +55,28 @@ function CreateNewSession({user, setUser}) {
         })
     }
 
+
+    // let classSelectOptions = userCourses.map((course)=> course)
+
+    console.log(userCourses)
+
+    let classSelect = 
+    <select className="select w-full max-w-xs">
+        <option disabled selected>Choose a class to tie the session to</option>
+        <option>Homer</option>
+        <option>Marge</option>
+        <option>Bart</option>
+        <option>Lisa</option>
+        <option>Maggie</option>
+    </select>
+
     return (
         <div>
-            <h2>CreateNewSession</h2>
-            <form onSubmit={e => handleNewSession(e)}>
-                <input onChange={(e) => setNewSessionTitle(e.target.value)} value={newSessionTitle} />
-                <button type="submit">CREATE</button>
+            <h2>Create New Session</h2>
+            <form onSubmit={e => handleNewSession(e)} className="flex flex-col">
+                <label className='flex justify-self-start'>Session Title:</label>
+                <input onChange={(e) => setNewSessionTitle(e.target.value)} className='flex flex-grow bg-[#1a1a1a] rounded-xl p-3 text-gray-400' value={newSessionTitle} />
+                <button type="submit" className='btn btn-ghost'>CREATE</button>
             </form>
             
         </div>

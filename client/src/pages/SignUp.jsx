@@ -50,16 +50,17 @@ function SignUp() {
   
 
   return (
-    <div>
-      <h2>Sign Up</h2>
-      <div>
-        <form onSubmit={(e) => handleSignUp(e)}>
-          <label>Username:</label>
+    <div className="flex flex-col">
+      <h2 className="flex flex-row mx-auto my-3 text-3xl font-bold">Sign Up</h2>
+      <div className="flex flex-col">
+        <form onSubmit={(e) => handleSignUp(e)} className="flex flex-col bg-[#111111] p-3 rounded-xl">
+          <label className='flex justify-self-start'>Username:</label>
           <input
             type="text"
             value={username}
             placeholder='Username'
             onChange={(e) => setUsername(e.target.value)}
+            className='flex flex-grow bg-[#1a1a1a] rounded-xl p-3 text-gray-400'
           ></input>
           <label>Email:</label>
           <input
@@ -67,33 +68,37 @@ function SignUp() {
             value={email}
             placeholder='Email'
             onChange={(e) => setEmail(e.target.value)}
+            className='flex flex-grow bg-[#1a1a1a] rounded-xl p-3 text-gray-400'
           ></input>
-          <label>Name:</label>
+          <label className='flex justify-self-start'>Name:</label>
           <input
             type="text"
             value={nameOfUser}
             placeholder='Name'
             onChange={(e) => setNameOfUser(e.target.value)}
+            className='flex flex-grow bg-[#1a1a1a] rounded-xl p-3 text-gray-400'
           ></input>
-          <label>Password:</label>
+          <label className='flex justify-self-start'>Password:</label>
           <input
             type="password"
             value={password}
             placeholder='Password'
             onChange={(e) => { handleSetPassword(e.target.value) }}
+            className='flex flex-grow bg-[#1a1a1a] rounded-xl p-3 text-gray-400'
           ></input>
-          <label>Confirm Password:</label>
+          <label className='flex justify-self-start'>Confirm Password:</label>
           <input
             type="password"
             value={confirmPassword}
             placeholder='Confirm Password'
             onChange={(e) => { handleSetConfirmPassword(e.target.value) }}
+            className='flex flex-grow bg-[#1a1a1a] rounded-xl p-3 text-gray-400'
           ></input>
             {!passwordCompare && <p>*Passwords must match.</p>}
-          <button type="submit">Sign Up</button>
+          <button type="submit" className="btn btn-ghost">Sign Up</button>
         </form>
       </div>
-      <button onClick={() => navigate("/login")}>Log In?</button>
+      <button onClick={() => navigate("/login")} className="btn btn-ghost">Log In?</button>
     </div>
   )
 }
