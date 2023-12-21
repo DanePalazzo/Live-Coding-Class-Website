@@ -151,8 +151,7 @@ class Enrollment(db.Model, SerializerMixin):
         "-user.last_login_date",
         "-user.courses_taught",
         "-user.enrollments",
-        "-course.enrollments",
-        "-course.sessions",
+        "-course.enrollments"
     )
 
 class SessionParticipant(db.Model, SerializerMixin):

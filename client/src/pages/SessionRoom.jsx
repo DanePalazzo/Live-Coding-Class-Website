@@ -158,35 +158,80 @@ function SessionRoom({ user, sessionId, setSessionId }) {
     //Create Toggle
     function toggleCreate() {
         setShowCreate(!showCreate)
-      }
+    }
+
 
     //Code Editor Map
     let mappedActiveProjects = activeProjects.length !== 0 ? 
         activeProjects.map((activeProject) => {
             return <CodeEditor sessionId={sessionId} connected={connected} socket={socket} user={user} activeProject={activeProject}/>
-        }) : <h2>No Active Projects</h2>
+    }) : <h2>No Active Projects</h2>
+
+    
+    let activProjectSelector = <div></div>
+    
+    //New Code Editor
+    let codeEditorDisplay = 
+    <div>
+        <div>
+            <CodeEditor/>
+        </div>
+        <div>
+            <CodeEditor/>
+        </div>
+    </div>
 
 
-        
-    return (
-        <>
-        <div className='grid grid-cols-4 grid-flow-row'>
+    let createProjectModal = 
+        <div>
+            <button className="btn btn btn-success" onClick={() => document.getElementById('create_project_modal').showModal()}>Create New Project</button>
+            <dialog id="create_project_modal" className="modal">
+                <div className="modal-box bg-[#111111]">
+                    <form method="dialog">
+                        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                    </form>
+                    <CreateNewProject user={user} socket={socket} sessionId={sessionId} />
+                </div>
+            </dialog>
+        </div>
+
+    let pageContents = 
+        <div>
             <div>
                 <h1>Session</h1>
                 <button onClick={handleDisconnect}>LEAVE SESSION</button>
+                <label htmlFor="my-drawer" className="btn btn-primary drawer-button">Projects</label>
             </div>
-            <div>
-                {showCreate ? <CreateNewProject user={user} socket={socket} sessionId={sessionId}/> : null}
-                <button onClick={toggleCreate}>CREATE NEW PROJECT</button>
-                <ProjectSelector userProjects={userProjects} sessionProjects={sessionProjects} user={user} sessionId={sessionId} socket={socket}/>
-            </div>
-            <div className="code1">
-                {mappedActiveProjects}
-            </div>
-            <div>
-                <Chat messages={messages} user={user} socket={socket} sessionId={sessionId} connected={connected} setMessages={setMessages}/>
+            <div className='grid grid-cols-5'>
+                <div className='col-span2'>
+                    {mappedActiveProjects}
+                </div>
+                <div className='col-span-1'>
+                    <Chat messages={messages} user={user} socket={socket} sessionId={sessionId} connected={connected} setMessages={setMessages} />
+                </div>
             </div>
         </div>
+
+    let projectSelectorDrawer = 
+        <div className="drawer">
+            <input id="my-drawer" type="checkbox" className="drawer-toggle" />
+            <div className="drawer-content">
+                {/* Page content here */}
+                {pageContents}
+            </div>
+            <div className="drawer-side">
+                <label htmlFor="my-drawer" aria-label="close sidebar" className="drawer-overlay"></label>
+                <ul className="menu p-4 w-100 min-h-full bg-base-200 text-base-content">
+                    {/* Sidebar content here */}
+                    {createProjectModal}
+                    <ProjectSelector userProjects={userProjects} sessionProjects={sessionProjects} user={user} sessionId={sessionId} socket={socket} />
+                </ul>
+            </div>
+        </div>
+
+    return (
+        <>
+            {projectSelectorDrawer}
         </>
 
 

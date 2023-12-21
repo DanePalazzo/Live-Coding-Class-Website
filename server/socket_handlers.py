@@ -1,5 +1,5 @@
 from config import request, socket_io, db, join_room, leave_room
-from models import ChatMessage, Document, Session, Project
+from models import ChatMessage, Document, Session, Project, SessionParticipant, ProjectSession
 
 
 #CONNECTION
@@ -7,14 +7,29 @@ from models import ChatMessage, Document, Session, Project
 def handle_connect():
     print('new connection')
 
+
 #JOIN ROOM
 @socket_io.on('join_session')
-def handle_join_room(session_id):
+def handle_join_room(session_id, user_id):
     print(session_id)
     join_room(session_id)
+    session_participant = SessionParticipant.query.filter_by(user_id=user_id, session_id=session_id).first()
+    if session_participant:
+        session_participant.is_active = True
+        db.session.commit()
+
+#LEAVE ROOM
+@socket_io.on('leave_session')
+def handle_leave_room(session_id, user_id):
+    print(session_id)
+    leave_room(session_id)
+    session_participant = SessionParticipant.query.filter_by(user_id=user_id, session_id=session_id).first()
+    if session_participant:
+        session_participant.is_active = False
+        db.session.commit()
 
 #DISCONNECT
-@socket_io.on("disconnect")
+@socket_io.on('disconnect')
 def handle_disconnected():
     print("user disconnected")
 
@@ -113,3 +128,28 @@ def document_update(user_id, session_id, document_id, edit_content):
     # except Exception as e:
     #     db.session.rollback()
     #     print(f"An error occurred in recording document edit history: {e}")
+
+#PROJECT ADDED TO SESSION
+@socket_io.on('create_new_project_in_session')
+def handle_create_new_project_in_session(user_id, session_id, title, description):
+    try:
+        new_project = Project(
+            title=title,
+            description=description,
+            owner_id=user_id
+        )
+        db.session.add(new_project)
+        db.session.commit()
+        new_project_session = ProjectSession(
+            project_id=new_project.id,
+            session_id=session_id
+        )
+        db.session.add(new_project_session)
+        db.session.commit()
+        client_session_id = request.sid
+        socket_io.emit('project_created', new_project.to_dict(), room=client_session_id)
+        socket_io.emit('project_added_to_session', new_project_session.to_dict(), room=session_id)
+    except Exception as e:
+        db.session.rollback()
+        print(e.__str__())
+        print(f"An error occurred while creating your project: {e}")

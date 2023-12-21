@@ -60,6 +60,7 @@ function CreateNewSession({user, setUser}) {
 
     console.log(userCourses)
 
+    //implement class to add session to with select ****************************************************************************
     let classSelect = 
     <select className="select w-full max-w-xs">
         <option disabled selected>Choose a class to tie the session to</option>
@@ -72,7 +73,7 @@ function CreateNewSession({user, setUser}) {
 
     return (
         <div>
-            <h2>Create New Session</h2>
+            <h2 className='text-3xl font-semibold'>Create New Session</h2>
             <form onSubmit={e => handleNewSession(e)} className="flex flex-col">
                 <label className='flex justify-self-start'>Session Title:</label>
                 <input onChange={(e) => setNewSessionTitle(e.target.value)} className='flex flex-grow bg-[#1a1a1a] rounded-xl p-3 text-gray-400' value={newSessionTitle} />

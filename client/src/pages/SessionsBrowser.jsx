@@ -6,13 +6,9 @@ import CreateNewSession from '../components/CreateNewSession';
 function SessionsBrowser({ user, setUser, sessionId, setSessionId }) {
   const [accessibleSessions, setAccessibleSessions] = useState([])
   const [loading, setLoading] = useState(false)
-  const [showCreate, setShowCreate] = useState(false)
 
   const navigate = useNavigate();
 
-  function toggleCreate() {
-    setShowCreate(!showCreate)
-  }
 
   useEffect(()=>{
     setLoading(true)

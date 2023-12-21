@@ -52,7 +52,7 @@ function SignUp() {
   return (
     <div className="flex flex-col">
       <h2 className="flex flex-row mx-auto my-3 text-3xl font-bold">Sign Up</h2>
-      <div className="flex flex-col">
+      <div className="flex flex-col w-1/3 self-center">
         <form onSubmit={(e) => handleSignUp(e)} className="flex flex-col bg-[#111111] p-3 rounded-xl">
           <label className='flex justify-self-start'>Username:</label>
           <input
@@ -62,7 +62,7 @@ function SignUp() {
             onChange={(e) => setUsername(e.target.value)}
             className='flex flex-grow bg-[#1a1a1a] rounded-xl p-3 text-gray-400'
           ></input>
-          <label>Email:</label>
+          <label className='flex justify-self-start'>Email:</label>
           <input
             type="text"
             value={email}

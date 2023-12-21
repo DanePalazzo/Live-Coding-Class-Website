@@ -318,6 +318,13 @@ class Enrollments(BaseResource):
                 course_id = data["course_id"]
             )
             db.session.add(new_enrollment)
+            rel_sessions_ids = [session.id for session in new_enrollment.course.sessions]
+            for rel_sessions_id in rel_sessions_ids:
+                new_session_participant = SessionParticipant(
+                    user_id = data["user_id"],
+                    session_id = rel_sessions_id
+                )
+                db.session.add(new_session_participant)
             db.session.commit()
             return new_enrollment.to_dict(rules=None), 201
         except Exception as e:

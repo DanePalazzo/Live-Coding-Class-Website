@@ -1,13 +1,17 @@
 import React from 'react'
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 
 export default function NavLayout({user, setUser}) {
+    const navigate = useNavigate();
 
     async function handleLogOut() {
         try {
-            await fetch("/api/logout", { method: "DELETE" });
-            setUser(null);
-            alert("Signed Out");
+            fetch("/api/logout", { method: "DELETE" })
+            .then(() => {
+                navigate("/login")
+                setUser(null)
+                alert("Signed Out")
+            })
         } catch (error) {
             console.error("Logout failed:", error);
         }
@@ -50,11 +54,12 @@ export default function NavLayout({user, setUser}) {
 
 
     return (
-        <div className='w-screen object-top sticky'>
-            <header>
+        <div>
+            <header className='w-screen object-top top-0 sticky'>
                 {navbar}
             </header>
-            <main>
+            {/* <main> */}
+            <main className='min-w-fit min-h-screen'>
                 <Outlet />
             </main>
         </div>

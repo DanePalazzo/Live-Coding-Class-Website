@@ -33,12 +33,11 @@ function Chat({ messages, user, socket, connected, sessionId, setMessages }) {
     }
 
     return (
-        <div>
+        <div className="flex flex-col justify-center bg-[#111111] p-3 rounded-xl">
             <ChatBox messages={messages} user={user} socket={socket} sessionId={sessionId} />
-            <form onSubmit={e => handleSendMessage(e)}>
-                <label>Message:</label>
-                <input onChange={(e) => setNewMessage(e.target.value)} value={newMessage} />
-                <button type="submit">SEND</button>
+            <form onSubmit={e => handleSendMessage(e)} className="flex flex-col justify-center p-1 rounded-xl">
+                <input onChange={(e) => setNewMessage(e.target.value)} value={newMessage} className='flex flex-grow bg-[#1a1a1a] rounded-xl p-2 text-gray-400'/>
+                <button type="submit" className="btn btn-ghost">SEND</button>
             </form>
 
         </div>

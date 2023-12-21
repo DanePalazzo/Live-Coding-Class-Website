@@ -11,11 +11,11 @@ function ProjectSelector({ userProjects, sessionProjects, user, sessionId, socke
 
     return (
         <div>
-            <div>
+            <div className='flex flex-col gap-2'>
                 <h3>Your Projects:</h3>
                 {mappedUserProjects}
             </div>
-            <div>
+            <div className='flex flex-col gap-2'>
                 <h3>Projects Shared with this Session:</h3>
                 {mappedSessionProjects}
             </div>
