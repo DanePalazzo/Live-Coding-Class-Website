@@ -2,30 +2,34 @@ import { React, useState, useEffect, useRef } from 'react'
 import { io } from 'socket.io-client';
 import Editor from '@monaco-editor/react'
 import Explorer from './Explorer';
+import ActiveProjects from './ActiveProjects';
 
-function CodeEditorReworked({ sessionId, connected, socket, user, displayedProject }) {
+function CodeEditorReworked({ sessionId, connected, socket, user, activeProjects }) {
     const [codeValue, setCodeValue] = useState("")
     const [currentDocument, setCurrentDocument] = useState(null)
+    const [hideExplorer, setHideExplorer] = useState(false)
+    const [displayedProject, setDisplayedProject] = useState(null)
     const editorRef = useRef(null)
 
-    useEffect(()=>{
-        if(currentDocument){
+    useEffect(() => {
+        if (currentDocument) {
             setCodeValue(currentDocument.content)
+
         }
     }, [currentDocument])
 
     //Monaco Mounts
-    function handleEditorDidMount(editor, monaco){
+    function handleEditorDidMount(editor, monaco) {
         editorRef.current = editor
     }
 
-    function getEditorValue(){
+    function getEditorValue() {
         console.log(editorRef.current.getValue())
         return editorRef.current.getValue();
     }
 
     function emitUpdateDocument(user_id, session_id, document_id, edit_content) {
-        console.log(`document_id: ${document_id} session_id: ${session_id} edit_content: ${edit_content}` )
+        console.log(`document_id: ${document_id} session_id: ${session_id} edit_content: ${edit_content}`)
         console.log(`Sent Message: ${edit_content}`)
         socket.emit('document_update', user_id, session_id, document_id, edit_content)
     }
@@ -46,29 +50,52 @@ function CodeEditorReworked({ sessionId, connected, socket, user, displayedProje
         }
     }, [connected]);
 
-    
+
+    let displayProjectExplorer = displayedProject ?
+        <Explorer user={user} socket={socket} sessionId={sessionId} displayedProject={displayedProject} currentDocument={currentDocument} setCurrentDocument={setCurrentDocument} />
+        : <h4>Select a Project</h4>
+
+
+    function handleHideExplorer() {
+        setHideExplorer(!hideExplorer)
+    }
 
     return (
-        <div className='grid flex-grow'>
-            <div>
-                <button>Show Explorer</button>
+        <div>
+            <div className='flex flex-row justify-between p-2'>
+                <label className="swap justify-start">
+                    <input type="checkbox" onChange={handleHideExplorer} />
+                    <div className="swap-on">SHOW</div>
+                    <div className="swap-off">HIDE</div>
+                </label>
+                <div>
+                    {displayedProject ? <h2 className='text-2xl font-bold'>{displayedProject.name}</h2> : <h2 className='text-2xl font-bold'>Select A Project</h2>}
+                    {displayedProject ? currentDocument ? <h2 className='text-xl font-semibold'>{currentDocument.name}</h2> : <h2 className='text-xl font-semibold'>Select A Document</h2> : null}
+                </div>
+                <div>
+                    <ActiveProjects user={user} activeProjects={activeProjects} displayedProject={displayedProject} setDisplayedProject={setDisplayedProject}/>
+                </div>
             </div>
-            <div>
-                <Explorer displayedProject={displayedProject} currentDocument={currentDocument} setCurrentDocument={setCurrentDocument}/>
-            </div>
-            <div className='code_editor'>
-                {currentDocument ? <Editor
-                    onChange={handleCodeChange}
-                    height="100%"
-                    width="100%"
-                    theme='vs-dark'
-                    onMount={handleEditorDidMount}
-                    path= {currentDocument ? currentDocument.title : ""}
-                    defaultLanguage="python"
-                    language={currentDocument ? currentDocument.language : ""}
-                    value={codeValue}
-                />
-                : <h4>Select a Documnet</h4>}
+            <div className='grid grid-cols-3 flex-grow'>
+                {!hideExplorer ?
+                    <div className='col-span1 justify-start bg-[#111111] p-3 rounded-xl'>
+                        {displayProjectExplorer}
+                    </div>
+                    : null}
+                <div className="flex flex-grow justify-center bg-[#111111]">
+                    {currentDocument ? <Editor
+                        onChange={handleCodeChange}
+                        height="100%"
+                        width="100%"
+                        theme='vs-dark'
+                        onMount={handleEditorDidMount}
+                        path={currentDocument ? currentDocument.title : ""}
+                        defaultLanguage="python"
+                        language={currentDocument ? currentDocument.language : ""}
+                        value={codeValue}
+                    />
+                        : null}
+                </div>
             </div>
         </div>
     )

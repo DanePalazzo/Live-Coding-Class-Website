@@ -1,16 +1,40 @@
-import React from 'react'
+import {React, useState} from 'react'
 import ExplorerElement from './ExplorerElement'
+import CreateNewDocument from './CreateNewDocument'
 
-function Explorer({ activeProject, currentDocument, setCurrentDocument}) {
+function Explorer({ user, socket, sessionId, displayedProject, currentDocument, setCurrentDocument}) {
+    // const [explorerDocuments, setExplorerDocuments] = useState(<h4>Select A Project.</h4>)
+    console.log(displayedProject)
 
-    console.log(activeProject)
-    let mappedDocuments = activeProject.documents.length !== 0 ? activeProject.documents.map((document) => <ExplorerElement key={document.id} document={document} currentDocument={currentDocument} setCurrentDocument={setCurrentDocument}/>) : <h4>This Project has no Documents.</h4>
+
+    let explorerDocuments = 
+        displayedProject ?
+            displayedProject.documents.length !== 0 ? 
+                displayedProject.documents.map((document) => <ExplorerElement key={document.id} document={document} currentDocument={currentDocument} setCurrentDocument={setCurrentDocument}/>) 
+                : <h4>This Project has no Documents.</h4>
+            : <h4>Select A Project.</h4>
+
+    
+
+     
+    let createDocumentModal =
+        <div>
+            <button className="btn btn btn-success" onClick={() => document.getElementById('create_document_modal').showModal()}>Create New document</button>
+            <dialog id="create_document_modal" className="modal">
+                <div className="modal-box bg-[#111111]">
+                    <form method="dialog">
+                        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                    </form>
+                    <CreateNewDocument user={user} socket={socket} sessionId={sessionId} displayedProject={displayedProject}/>
+                </div>
+            </dialog>
+        </div>
 
     return (
         <div>
             <h2>Explorer</h2>
-            <div>{mappedDocuments}</div>
-            <button>Create Document</button>
+            <div>{explorerDocuments}</div>
+            {createDocumentModal}
         </div>
     )
 }

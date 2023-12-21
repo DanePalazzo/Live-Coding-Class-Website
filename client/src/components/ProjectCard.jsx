@@ -50,7 +50,7 @@ function ProjectCard({ project, owner, sessionId, socket, sessionProjects }) {
                 <p>Owner: {owner}</p>
                 <div className="flex flex-row justify-end">
                     {shareWithSessionModal}
-                    <button className="btn btn-outline btn-sm btn-accent" onClick={(e) => handleProjectRequest(e)}>Set As Active</button>
+                    <button className="btn btn-outline btn-sm btn-accent" onClick={() => handleProjectRequest()}>Set As Active</button>
                 </div>
             </div>
         </div>

@@ -33,7 +33,7 @@ export default function NavLayout({user, setUser}) {
             </div>
         </div>
         <div className="navbar-center">
-            <NavLink to='/' ><a className="btn btn-ghost text-2xl text-white">LIVE CODE</a></NavLink>
+            <NavLink to='/' ><h2 className="text-5xl text-green-100 font-black">LIVE CODE</h2></NavLink>
         </div>
         <div className="navbar-end">
             <div className="dropdown dropdown-end">

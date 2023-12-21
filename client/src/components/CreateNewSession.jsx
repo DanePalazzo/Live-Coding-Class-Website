@@ -8,10 +8,12 @@ function CreateNewSession({user, setUser}) {
     console.log(user)
 
     useEffect(()=>{
-        let userCourseList = user.enrollments.length !== 0 ? user.enrollments.map((enrollment) => enrollment.course) : null
-        console.log(userCourseList)
-        setUserCourses(user)
-    }, [])
+        if(user){
+            let userCourseList = user.enrollments.length !== 0 ? user.enrollments.map((enrollment) => enrollment.course) : null
+            console.log(userCourseList)
+            setUserCourses(user)     
+        }
+    }, [user])
 
     function handleNewSession(e){
         e.preventDefault()
@@ -74,9 +76,9 @@ function CreateNewSession({user, setUser}) {
     return (
         <div>
             <h2 className='text-3xl font-semibold'>Create New Session</h2>
-            <form onSubmit={e => handleNewSession(e)} className="flex flex-col">
+            <form onSubmit={e => handleNewSession(e)} className="flex flex-col gap-2">
                 <label className='flex justify-self-start'>Session Title:</label>
-                <input onChange={(e) => setNewSessionTitle(e.target.value)} className='flex flex-grow bg-[#1a1a1a] rounded-xl p-3 text-gray-400' value={newSessionTitle} />
+                <input onChange={(e) => setNewSessionTitle(e.target.value)} className='flex flex-grow bg-[#1a1a1a] rounded-xl p-3 text-gray-300' value={newSessionTitle} />
                 <button type="submit" className='btn btn-ghost'>CREATE</button>
             </form>
             

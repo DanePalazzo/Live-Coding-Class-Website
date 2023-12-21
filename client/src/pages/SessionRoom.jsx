@@ -7,6 +7,7 @@ import CodeEditor from '../components/CodeEditor'
 import ProjectSelector from '../components/ProjectSelector'
 import Editor from '@monaco-editor/react'
 import CreateNewProject from '../components/CreateNewProject';
+import CodeEditorReworked from '../components/CodeEditorReworked';
 
 
 function SessionRoom({ user, sessionId, setSessionId }) {
@@ -30,7 +31,7 @@ function SessionRoom({ user, sessionId, setSessionId }) {
     const [activeProjects, setActiveProjects] = useState([])
     const [showCreate, setShowCreate] = useState(false)
     const location = useLocation();
-    // console.log(userProjects)
+    console.log(activeProjects)
 
     //socket connect
     useEffect(() => {
@@ -170,17 +171,9 @@ function SessionRoom({ user, sessionId, setSessionId }) {
     
     let activProjectSelector = <div></div>
     
-    //New Code Editor
-    let codeEditorDisplay = 
-    <div>
-        <div>
-            <CodeEditor/>
-        </div>
-        <div>
-            <CodeEditor/>
-        </div>
-    </div>
+    let displayedProject1 = null
 
+    let displayedProject2 = null
 
     let createProjectModal = 
         <div>
@@ -212,12 +205,38 @@ function SessionRoom({ user, sessionId, setSessionId }) {
             </div>
         </div>
 
+    let pageContentsReworked = 
+    <div className='w-screen'>
+        <div className='navbar w-full bg-white bg-opacity-20'>
+            <div className="navbar-start">
+                <label htmlFor="my-drawer" className="btn btn-outline btn-primary drawer-button">Projects</label>
+            </div>
+            <div className="navbar-center">
+                <h1 className='text-[#111111] font-extrabold'>Session</h1>
+            </div>
+            <div className="navbar-end">
+                <button onClick={handleDisconnect} className='btn btn-outline btn-error'>LEAVE SESSION</button>
+            </div>           
+        </div>
+        <div className='grid grid-cols-5'>
+            <div className='col-span-2'>
+                <CodeEditorReworked sessionId={sessionId} connected={connected} socket={socket} user={user} activeProjects={activeProjects}/>
+            </div>
+            <div className='col-span-2'>
+                <CodeEditorReworked sessionId={sessionId} connected={connected} socket={socket} user={user} activeProjects={activeProjects}/>
+            </div>
+            <div className='col-span-1'>
+                <Chat messages={messages} user={user} socket={socket} sessionId={sessionId} connected={connected} setMessages={setMessages} />
+            </div>
+        </div>
+    </div>
+
     let projectSelectorDrawer = 
         <div className="drawer">
             <input id="my-drawer" type="checkbox" className="drawer-toggle" />
             <div className="drawer-content">
                 {/* Page content here */}
-                {pageContents}
+                {pageContentsReworked}
             </div>
             <div className="drawer-side">
                 <label htmlFor="my-drawer" aria-label="close sidebar" className="drawer-overlay"></label>
@@ -233,8 +252,6 @@ function SessionRoom({ user, sessionId, setSessionId }) {
         <>
             {projectSelectorDrawer}
         </>
-
-
     )
 }
 
