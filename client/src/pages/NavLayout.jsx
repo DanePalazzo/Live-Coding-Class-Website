@@ -29,6 +29,7 @@ export default function NavLayout({user, setUser}) {
                 <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-[#111111] rounded-box w-52">
                     <NavLink to='/' ><li><a>Home</a></li></NavLink>
                     {user && <NavLink to='sessionsbrowser'><li><a>Your Sessions</a></li></NavLink>}
+                    {user && <NavLink to='coursebrowser'><li><a>Course Browser</a></li></NavLink>}
                 </ul>
             </div>
         </div>
@@ -37,13 +38,13 @@ export default function NavLayout({user, setUser}) {
         </div>
         <div className="navbar-end">
             <div className="dropdown dropdown-end">
-                <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-                    <div class="w-10 rounded-full">
+                <div tabIndex="0" role="button" className="btn btn-ghost btn-circle avatar">
+                    <div className="w-10 rounded-full">
                         <img alt="User Profile Image" src="https://www.freeiconspng.com/thumbs/profile-icon-png/profile-icon-9.png" />
                     </div>
                 </div>
-                <ul tabindex="0" className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-[#111111] rounded-box w-52">
-                    {!user && <NavLink to='login'><li><a className="justify-between">Log In</a></li></NavLink>}
+                <ul tabIndex="0" className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-[#111111] rounded-box w-52">
+                    {!user && <NavLink to='login'><li><a>Log In</a></li></NavLink>}
                     {!user && <NavLink to='signup'><li><a>Sign Up</a></li></NavLink>}
                     {user && <NavLink to='account'><li><a>{user._username.toUpperCase()}</a></li></NavLink>}
                     {user && <li><a onClick={handleLogOut}>Logout</a></li>}
