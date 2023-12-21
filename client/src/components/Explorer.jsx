@@ -2,7 +2,7 @@ import {React, useState} from 'react'
 import ExplorerElement from './ExplorerElement'
 import CreateNewDocument from './CreateNewDocument'
 
-function Explorer({ user, socket, sessionId, displayedProject, currentDocument, setCurrentDocument}) {
+function Explorer({ user, socket, sessionId, displayedProject, currentDocument, setCurrentDocument, activeProjects}) {
     // const [explorerDocuments, setExplorerDocuments] = useState(<h4>Select A Project.</h4>)
     console.log(displayedProject)
 

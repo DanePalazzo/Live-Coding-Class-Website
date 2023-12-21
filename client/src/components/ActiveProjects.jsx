@@ -13,6 +13,7 @@ function ActiveProjects({ user, activeProjects, displayedProject, setDisplayedPr
             setDisplayedProjectId(displayedProject.id)
         }
     }, [displayedProject])
+    
 
     let activProjectSelector = activeProjects.length !== 0 ?
         activeProjects.map((activeProject) =>

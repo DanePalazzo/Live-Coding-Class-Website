@@ -62,19 +62,29 @@ def user_message(user_id, session_id, message_txt):
         db.session.rollback()
         print(f"Error saving message: {e}")
 
+#DELETE MESSAGE
+@socket_io.on('delete_message')
+def edit_message(user_id, session_id, chat_message_id):
+    print(f"Delete Recieved! user: {user_id}, message: {chat_message_id} session: {session_id}")
+    message = ChatMessage.query.filter_by(id=chat_message_id).first()
+    if not message:
+        return {"error": f"Chat with the id: {chat_message_id} not found"}, 404
+    db.session.delete(message)
+    db.session.commit()
+    socket_io.emit('message_deleted', chat_message_id, room=session_id)
 
 #EDIT MESSAGE
 @socket_io.on('edit_message')
-def edit_message(user_id, chat_id, session_id, new_message_txt):
-    print(f"Edit Recieved! user: {user_id}, chat: {chat_id} session: {session_id}, message: {new_message_txt}")
-    message = ChatMessage.query.filter_by(id=chat_id).first()
+def edit_message(user_id, session_id, chat_message_id, new_message_txt):
+    print(f"Edit Recieved! user: {user_id}, message: {chat_message_id} session: {session_id}, message: {new_message_txt}")
+    message = ChatMessage.query.filter_by(id=chat_message_id).first()
     if not message:
-        return {"error": f"Chat with the id: {chat_id} not found"}, 404
+        return {"error": f"Chat with the id: {chat_message_id} not found"}, 404
     try:
         setattr(message, "message_text", new_message_txt)
         setattr(message, "edited", True)
         db.session.commit()
-        return message.to_dict(), 200
+        socket_io.emit('message_edited', message.to_dict(), room=session_id)
     except Exception as e:
         db.session.rollback()
         print(f"Error saving message: {e}")
@@ -97,6 +107,34 @@ def project_fetch(project_id, session_id):
     client_session_id = request.sid
     print(project.to_dict())
     socket_io.emit('active_projects_fetched', project.to_dict(), room=client_session_id)
+
+
+#CREATE NEW DOCUMENT IN SESSION
+@socket_io.on('create_new_document_in_project')
+def handle_create_new_document_in_project(user_id, session_id, project_id, new_document_title, new_document_language):
+    print(f"New Document Recieved! user: {user_id}, session_id:{session_id}, document_title: {new_document_title}, new_document_language: {new_document_language}")
+    try:
+        new_document = Document(
+            project_id = project_id,
+            title = new_document_title,
+            language = new_document_language,
+            content = ""
+        )
+        db.session.add(new_document)
+        db.session.commit()
+        print(new_document.to_dict())
+        document_session_ids = [session.id for session in new_document.project.sessions]
+        if session_id in document_session_ids:
+            socket_io.emit('created_new_document', {"user_id": user_id, "new_document": new_document.to_dict()}, room=session_id)
+            print("emited to room")
+        else:
+            client_session_id = request.sid
+            socket_io.emit('created_new_document', {"user_id": user_id, "new_document": new_document.to_dict()}, room=client_session_id)
+            print("emited to submitter")
+    except Exception as e:
+        db.session.rollback()
+        print(f"An error occurred while updating document: {e}")
+
 
 #DOCUMENT UPDATE
 @socket_io.on('document_update')

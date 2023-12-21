@@ -31,7 +31,19 @@ function SessionRoom({ user, sessionId, setSessionId }) {
     const [activeProjects, setActiveProjects] = useState([])
     const [hideChat, setHideChat] = useState(false)
     const location = useLocation();
+
+    const activeProjectDocuments = activeProjects.map((activeProject) => activeProject.documents)
+    const flattenedDocuments = activeProjectDocuments.flat();
+
+    // console.log(activeProjectDocuments)
+    // console.log(flattenedDocuments)
     console.log(activeProjects)
+    //refs for setting state in useEffects
+    const activeProjectsRef = useRef(activeProjects)
+    useEffect(() => {
+        activeProjectsRef.current = activeProjects;
+    }, [activeProjects]);
+
 
     //socket connect
     useEffect(() => {
@@ -86,12 +98,12 @@ function SessionRoom({ user, sessionId, setSessionId }) {
         }
     }, [connected]);
 
-    //Active Project Setter
+    //Active Project Setter and created_new_documets
     useEffect(() => {
         if (connected) {
             socket.on('active_projects_fetched', (serverMessage) => {
                 console.log("active_projects_fetched")
-                console.log(messages)
+                // console.log(messages)
                 console.log(serverMessage)
                 let updatedActiveProjects = [...activeProjects]
                 updatedActiveProjects = [...updatedActiveProjects, serverMessage]
@@ -101,9 +113,32 @@ function SessionRoom({ user, sessionId, setSessionId }) {
         return () => {
             if (socket) {
                 socket.removeListener('active_projects_fetched', (msg) => {console.log(msg); });
+                socket.removeListener('created_new_document', (msg) => {console.log(msg); });
             }
         }
     }, [activeProjects, connected]);
+
+    useEffect(() => {
+        if (connected) {
+            socket.on('created_new_document', (serverMessage) => {
+                const newDocument = serverMessage.new_document;
+                const projectIdToUpdate = newDocument.project.id;
+                console.log(serverMessage)
+                setActiveProjects(currentProjects => 
+                    currentProjects.map(project => 
+                        project.id === projectIdToUpdate 
+                            ? { ...project, documents: [...project.documents, newDocument] } 
+                            : project
+                    )
+                );
+            });
+        }
+        return () => {
+            if (socket) {
+                socket.removeListener('created_new_document', (msg) => {console.log(msg); });
+            }
+        }
+    }, [connected]);
 
     //Project Added To Session WIP ************************************************************************************
     useEffect(()=> {

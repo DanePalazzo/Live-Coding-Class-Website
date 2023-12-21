@@ -3,7 +3,7 @@ import ProjectCard from './ProjectCard'
 
 function ProjectSelector({ userProjects, sessionProjects, user, sessionId, socket }) {
 
-    console.log(sessionProjects)
+    // console.log(sessionProjects)
 
     let mappedUserProjects = userProjects.length !== 0 ? userProjects.map((project)=> <ProjectCard key={project.id} project={project} owner={user.name} sessionId={sessionId} socket={socket} sessionProjects={sessionProjects}/>) : <h3>You have no projects. Create a project to see them here!</h3>
 

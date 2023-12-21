@@ -251,6 +251,8 @@ class Document(db.Model, SerializerMixin):
         '-edits.document',
         '-project.documents',
         '-project.sessions',
+        '-project.sessions.updated_at',
+        '-project.sessions.project',
         )
 
 

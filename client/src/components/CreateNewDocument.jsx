@@ -1,17 +1,19 @@
 import {React, useState} from 'react'
 
-function CreateNewDocument({user, socket, sessionId, displayedProject}) {
+function CreateNewDocument({user, socket, sessionId, displayedProject, activeProjects}) {
     const [newDocumentTitle, setNewDocumentTitle] = useState("")
     const [newDocumentLanguage, setNewDocumentLanguage] = useState(null)
 
 
     function handleCreateNewDocument(e){
         e.preventDefault()
-        if(newDocumentLanguage || newDocumentTitle.length === 0){
+        if(newDocumentLanguage === null || newDocumentTitle.length === 0){
             alert('Please enter a name and select a language.')
         }else{
             console.log(`'create_new_document_in_project', ${user.id}, ${sessionId}, ${newDocumentTitle}, ${newDocumentLanguage}`)
-            // socket.emit('create_new_document_in_project', user.id, sessionId, newDocumentTitle, newDocumentLanguage)
+            socket.emit('create_new_document_in_project', user.id, sessionId, displayedProject.id, newDocumentTitle, newDocumentLanguage)
+            newDocumentTitle("")
+            setNewDocumentLanguage(null)
         }
     }
 
@@ -113,7 +115,7 @@ function CreateNewDocument({user, socket, sessionId, displayedProject}) {
     return (
         <div>
             <h2 className='text-3xl font-semibold'>Create New Document</h2>
-            <form onSubmit={e => handleCreateNewDocument(e)} className="flex flex-col gap-2">
+            <form onSubmit={(e) => handleCreateNewDocument(e)} className="flex flex-col gap-2">
                 <label className='flex justify-self-start'>Title:</label>
                 <input onChange={(e) => setNewDocumentTitle(e.target.value)} className='flex flex-grow bg-[#1a1a1a] rounded-xl p-3 text-gray-300' value={newDocumentTitle} />
                 <label className='flex justify-self-start'>Language:</label>

@@ -14,9 +14,19 @@ function CodeEditorReworked({ sessionId, connected, socket, user, activeProjects
     useEffect(() => {
         if (currentDocument) {
             setCodeValue(currentDocument.content)
-
         }
     }, [currentDocument])
+
+    useEffect(() => {
+        console.log("useEffect called")
+        if(displayedProject){
+            let displayedProjectId = displayedProject.id
+            console.log(displayedProjectId)
+            let updatedDisplayProject = activeProjects.filter((project)=> project.id == displayedProjectId)
+            console.log(updatedDisplayProject[0])
+            setDisplayedProject(updatedDisplayProject[0])
+        }
+    },[activeProjects])
 
     //Monaco Mounts
     function handleEditorDidMount(editor, monaco) {
