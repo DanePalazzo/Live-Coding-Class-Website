@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function Message({ message, user, onEdit, onDelete }) {
+function Message({ message, user }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedMessage, setEditedMessage] = useState(message.message_text);
 
@@ -46,21 +46,12 @@ function Message({ message, user, onEdit, onDelete }) {
           <p className='text-left'>{message.message_text}</p>
         )}
       </div>
+      {isUserMessage ?
       <div className="flex flex-row chat-footer opacity-50">
           <p className='text-xs text-white' onClick={handleDelete}>🗑️</p>
           <p className='text-xs text-white' onClick={toggleEdit}>✎</p>
-      </div>
-      {/* Show Edit and Delete buttons only if the current user posted the message */}
-      {/* {isUserMessage && (
-        <>
-          {isEditing ? (
-            <button onClick={submitEdit}>SUBMIT</button>
-          ) : (
-            <button onClick={toggleEdit}>EDIT</button>
-          )}
-          <button onClick={handleDelete}>DELETE</button>
-        </>
-      )} */}
+      </div> :
+      null }
     </div>
   );
 }

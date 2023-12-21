@@ -9,7 +9,7 @@ function ExplorerElement({document, currentDocument, setCurrentDocument}) {
 
     return (
         <div>
-            <h4 onClick={handleSetCurrentDocument}>{document.title}</h4>
+            <button className="btn btn-sm btn-ghost" onClick={handleSetCurrentDocument}>{document.title}</button>
         </div>
     )
 }

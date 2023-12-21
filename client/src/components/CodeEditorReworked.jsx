@@ -60,8 +60,10 @@ function CodeEditorReworked({ sessionId, connected, socket, user, activeProjects
         setHideExplorer(!hideExplorer)
     }
 
+    let editorSpan = hideExplorer ? "col-span-3" : "col-span-2"
+
     return (
-        <div>
+        <div className='h-screen max-h-screen'>
             <div className='flex flex-row justify-between p-2'>
                 <label className="swap justify-start">
                     <input type="checkbox" onChange={handleHideExplorer} />
@@ -69,20 +71,20 @@ function CodeEditorReworked({ sessionId, connected, socket, user, activeProjects
                     <div className="swap-off">HIDE</div>
                 </label>
                 <div>
-                    {displayedProject ? <h2 className='text-2xl font-bold'>{displayedProject.name}</h2> : <h2 className='text-2xl font-bold'>Select A Project</h2>}
-                    {displayedProject ? currentDocument ? <h2 className='text-xl font-semibold'>{currentDocument.name}</h2> : <h2 className='text-xl font-semibold'>Select A Document</h2> : null}
+                    {displayedProject ? <h2 className='text-2xl font-bold'>{displayedProject.title}</h2> : <h2 className='text-2xl font-bold'>Select A Project</h2>}
+                    {currentDocument ? <h2 className='text-xl font-semibold'>{currentDocument.title}</h2> : <h2 className='text-xl font-semibold'>Select A Document</h2>}
                 </div>
                 <div>
                     <ActiveProjects user={user} activeProjects={activeProjects} displayedProject={displayedProject} setDisplayedProject={setDisplayedProject}/>
                 </div>
             </div>
-            <div className='grid grid-cols-3 flex-grow'>
+            <div className='grid grid-cols-3 flex-grow h-full'>
                 {!hideExplorer ?
-                    <div className='col-span1 justify-start bg-[#111111] p-3 rounded-xl'>
+                    <div className='col-span-1 justify-start bg-[#111111] p-3 rounded-xl'>
                         {displayProjectExplorer}
                     </div>
                     : null}
-                <div className="flex flex-grow justify-center bg-[#111111]">
+                <div className={`${editorSpan} flex flex-grow h-full justify-center bg-[#111111]`}>
                     {currentDocument ? <Editor
                         onChange={handleCodeChange}
                         height="100%"

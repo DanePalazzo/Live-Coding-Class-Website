@@ -54,12 +54,12 @@ export default function NavLayout({user, setUser}) {
 
 
     return (
-        <div>
-            <header className='w-screen object-top top-0 sticky'>
+        <div className="w-screen min-h-screen">
+            <header className='w-full object-top top-0 z-50 sticky'>
                 {navbar}
             </header>
             {/* <main> */}
-            <main className='min-w-fit min-h-screen'>
+            <main className='min-w-full min-h-full'>
                 <Outlet />
             </main>
         </div>

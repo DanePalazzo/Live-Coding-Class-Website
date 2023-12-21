@@ -29,7 +29,7 @@ function SessionRoom({ user, sessionId, setSessionId }) {
     const [userProjects, setUserProjects] = useState([])
     const [sessionProjects, setSessionProjects] = useState([])
     const [activeProjects, setActiveProjects] = useState([])
-    const [showCreate, setShowCreate] = useState(false)
+    const [hideChat, setHideChat] = useState(false)
     const location = useLocation();
     console.log(activeProjects)
 
@@ -144,7 +144,7 @@ function SessionRoom({ user, sessionId, setSessionId }) {
     }, [connected, userProjects])
 
 
-    console.log(activeProjects)
+    // console.log(activeProjects)
 
 
     //Session Disconnect
@@ -156,25 +156,23 @@ function SessionRoom({ user, sessionId, setSessionId }) {
         navigate('/sessionsbrowser')
     }
 
-    //Create Toggle
-    function toggleCreate() {
-        setShowCreate(!showCreate)
+    let hideChatButton = hideChat ? <button onClick={handleHideChat} className='btn btn-secondary text-white'>SHOW CHAT</button> : <button onClick={handleHideChat} className='btn btn-outline btn-secondary'>HIDE CHAT</button>
+
+    //Hide Chat
+    function handleHideChat(){
+        setHideChat(!hideChat)
     }
 
-
     //Code Editor Map
-    let mappedActiveProjects = activeProjects.length !== 0 ? 
-        activeProjects.map((activeProject) => {
-            return <CodeEditor sessionId={sessionId} connected={connected} socket={socket} user={user} activeProject={activeProject}/>
-    }) : <h2>No Active Projects</h2>
+    // let mappedActiveProjects = activeProjects.length !== 0 ? 
+    //     activeProjects.map((activeProject) => {
+    //         return <CodeEditor sessionId={sessionId} connected={connected} socket={socket} user={user} activeProject={activeProject}/>
+    // }) : <h2>No Active Projects</h2>
 
-    
-    let activProjectSelector = <div></div>
-    
-    let displayedProject1 = null
+    let gridColSetter = hideChat ? "grid grid-cols-4" : "grid grid-cols-5"
 
-    let displayedProject2 = null
 
+    //Create Project
     let createProjectModal = 
         <div>
             <button className="btn btn btn-success" onClick={() => document.getElementById('create_project_modal').showModal()}>Create New Project</button>
@@ -188,45 +186,31 @@ function SessionRoom({ user, sessionId, setSessionId }) {
             </dialog>
         </div>
 
-    let pageContents = 
-        <div>
-            <div>
-                <h1>Session</h1>
-                <button onClick={handleDisconnect}>LEAVE SESSION</button>
-                <label htmlFor="my-drawer" className="btn btn-primary drawer-button">Projects</label>
-            </div>
-            <div className='grid grid-cols-5'>
-                <div className='col-span2'>
-                    {mappedActiveProjects}
-                </div>
-                <div className='col-span-1'>
-                    <Chat messages={messages} user={user} socket={socket} sessionId={sessionId} connected={connected} setMessages={setMessages} />
-                </div>
-            </div>
-        </div>
-
     let pageContentsReworked = 
-    <div className='w-screen'>
-        <div className='navbar w-full bg-white bg-opacity-20'>
+    <div className='w-full'>
+        <div className='navbar bg-green-100 bg-opacity-20'>
             <div className="navbar-start">
                 <label htmlFor="my-drawer" className="btn btn-outline btn-primary drawer-button">Projects</label>
             </div>
             <div className="navbar-center">
-                <h1 className='text-[#111111] font-extrabold'>Session</h1>
+                <h1 className='text-[#111111] font-extrabold'>SESSION</h1>
             </div>
             <div className="navbar-end">
-                <button onClick={handleDisconnect} className='btn btn-outline btn-error'>LEAVE SESSION</button>
+                <div className='flex flex-row gap-2'>
+                    {hideChatButton}
+                    <button onClick={handleDisconnect} className='btn btn-outline btn-error'>LEAVE SESSION</button>
+                </div>
             </div>           
         </div>
-        <div className='grid grid-cols-5'>
-            <div className='col-span-2'>
+        <div className={gridColSetter}>
+            <div className='col-span-2 bg-[#1a1a1a]'>
                 <CodeEditorReworked sessionId={sessionId} connected={connected} socket={socket} user={user} activeProjects={activeProjects}/>
             </div>
-            <div className='col-span-2'>
+            <div className='col-span-2 bg-[#2a2a2a]'>
                 <CodeEditorReworked sessionId={sessionId} connected={connected} socket={socket} user={user} activeProjects={activeProjects}/>
             </div>
             <div className='col-span-1'>
-                <Chat messages={messages} user={user} socket={socket} sessionId={sessionId} connected={connected} setMessages={setMessages} />
+                {!hideChat ? <Chat messages={messages} user={user} socket={socket} sessionId={sessionId} connected={connected} setMessages={setMessages} /> : null}
             </div>
         </div>
     </div>
@@ -249,9 +233,9 @@ function SessionRoom({ user, sessionId, setSessionId }) {
         </div>
 
     return (
-        <>
+        <div>
             {projectSelectorDrawer}
-        </>
+        </div>
     )
 }
 

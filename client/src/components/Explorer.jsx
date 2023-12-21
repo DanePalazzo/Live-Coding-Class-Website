@@ -19,7 +19,7 @@ function Explorer({ user, socket, sessionId, displayedProject, currentDocument, 
      
     let createDocumentModal =
         <div>
-            <button className="btn btn btn-success" onClick={() => document.getElementById('create_document_modal').showModal()}>Create New document</button>
+            <button className="btn btn btn-success" onClick={() => document.getElementById('create_document_modal').showModal()}>CREATE NEW DOCUMENT</button>
             <dialog id="create_document_modal" className="modal">
                 <div className="modal-box bg-[#111111]">
                     <form method="dialog">
@@ -32,9 +32,9 @@ function Explorer({ user, socket, sessionId, displayedProject, currentDocument, 
 
     return (
         <div>
-            <h2>Explorer</h2>
-            <div>{explorerDocuments}</div>
+            <h2 className='text-xl font-bold'>EXPLORER</h2>
             {createDocumentModal}
+            <div>{explorerDocuments}</div>
         </div>
     )
 }

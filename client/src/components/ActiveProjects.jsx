@@ -19,9 +19,11 @@ function ActiveProjects({ user, activeProjects, displayedProject, setDisplayedPr
             <li><a key={activeProject.id} onClick={(e) => handleSetDisplayedProject(e, activeProject)}>{activeProject.title}</a></li>)
         : <li><a>No Active Projects</a></li>
 
+    let dropdownColor = activeProjects.length !== 0 ? "btn-outline btn-primary" : "btn-ghost"
+
     let activProjectDropdown =
         <div className="dropdown">
-            <div tabIndex={0} role="button" className="btn btn-primary m-1">Active Projects</div>
+            <div tabIndex={0} role="button" className={`btn ${dropdownColor} m-1`}>Active Projects</div>
             <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-[#111111] rounded-box w-52">
                 {activProjectSelector}
             </ul>
