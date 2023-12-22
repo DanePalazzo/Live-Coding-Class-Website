@@ -8,8 +8,9 @@ function ExplorerElement({document, currentDocument, setCurrentDocument}) {
     }
 
     return (
-        <div>
+        <div className='flex flex-row justify-between'>
             <button className="btn btn-sm btn-ghost" onClick={handleSetCurrentDocument}>{document.title}</button>
+            <p className='text-xs'>{document.language}</p>
         </div>
     )
 }

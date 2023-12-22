@@ -36,7 +36,7 @@ function ProjectCard({ project, owner, sessionId, socket, sessionProjects }) {
     let shareWithSessionModal = 
         <div className='flex flex-grow'>
             <button className="btn btn-outline btn-sm btn-primary" onClick={() => document.getElementById('activate_project_modal').showModal()}>Share Project</button>
-            <dialog id="create_new_session_modal" className="modal">
+            <dialog id="activate_project_modal" className="modal">
                 <div className="modal-box bg-[#111111]">
                     <button className="btn btn-outline btn-block btn-primary" onClick={handleAddProjectToSession}>Share Project with Session</button>
                 </div>

@@ -1,7 +1,7 @@
 import {React, useState, useEffect} from 'react'
 import { useNavigate } from 'react-router-dom'
 
-function SessionBrowserTile({user, setUser, session, setSessionId}) {
+function SessionBrowserTile({user, setUser, session, setSessionId, setActiveSession}) {
   const [sessionTitle, setSessionTitle] = useState("")
   const [scheduledTime, setScheduledTime] = useState("")
   const [sessionOptionId, setSessionOptionId] = useState(null)
@@ -21,6 +21,7 @@ function SessionBrowserTile({user, setUser, session, setSessionId}) {
   function handleJoinSession(){
     console.log(session.session.id)
     setSessionId(session.session.id)
+    setActiveSession(session.session)
     navigate('/sessionroom')
     // console.log(session.session.id)
   }

@@ -32,7 +32,7 @@ function CoursesBrowser({user, setUser}) {
     );
 
     let availableCourses = filteredCourses.length > 0 
-  ? filteredCourses.map((course) => <CoursesBrowserTile key={course.id} course={course} user={user} />)
+  ? filteredCourses.map((course) => <CoursesBrowserTile key={course.id} course={course} user={user} setUser={setUser}/>)
   : <h3>No courses available.</h3>;
 
     let createNewCoursesModal = <div>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import SessionBrowserTile from '../components/SessionBrowserTile';
 import CreateNewSession from '../components/CreateNewSession';
 
-function SessionsBrowser({ user, setUser, sessionId, setSessionId }) {
+function SessionsBrowser({ user, setUser, sessionId, setSessionId, setActiveSession }) {
   const [accessibleSessions, setAccessibleSessions] = useState([])
   const [loading, setLoading] = useState(false)
 
@@ -27,7 +27,7 @@ function SessionsBrowser({ user, setUser, sessionId, setSessionId }) {
     }
   }, [user])
 
-  let mappedSessions = accessibleSessions.length !== 0 ? accessibleSessions.map((session) => <SessionBrowserTile key={session.id} user={user} setUser={setUser} session={session} setSessionId={setSessionId} />) : <h3>No sessions available. Join a session to see them here!</h3>
+  let mappedSessions = accessibleSessions.length !== 0 ? accessibleSessions.map((session) => <SessionBrowserTile key={session.id} user={user} setUser={setUser} session={session} setSessionId={setSessionId} setActiveSession={setActiveSession}/>) : <h3>No sessions available. Join a session to see them here!</h3>
 
 
   let createNewSessionModal = <div>

@@ -1,11 +1,12 @@
 import { React, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-function CoursesBrowserTile({user, course}) {
+function CoursesBrowserTile({user, setUser, course}) {
     const [courseTitle, setCourseTitle] = useState("")
     const [courseDescription, setCourseDescription] = useState("")
     const [courseInstructor, setCourseInstructor] = useState(null)
     const [courseSessions, setCourseSessions] = useState([])
+    const [loading, setLoading] = useState(false)
 
     const navigate = useNavigate()
 
@@ -19,14 +20,16 @@ function CoursesBrowserTile({user, course}) {
         setCourseSessions(course.sessions)
     }, [])
 
-    console.log(course)
+    // console.log(course)
 
     //ENROLL IN COURSE USING COURSE_ID AND USER_ID (AUTO ENROLLS IN SESSIONS)
     function handleEnrollInCourse(){
-        new_enrollment = {
+        setLoading(true)
+        let new_enrollment = {
             "user_id": user.id,
             "course_id": course.id
         }
+        console.log(new_enrollment)
         fetch('/api/enrollments', {
             method: "POST",
             headers: {"Content-Type": "application/json"},
@@ -36,31 +39,38 @@ function CoursesBrowserTile({user, course}) {
         .then(enrollment => {
             fetch("/api/checksession").then((response) => {
                 if (response.ok) {
-                  response.json().then((user) => {setUser(user); document.getElementById('enroll_course_modal').close()});
+                  response.json().then((user) => {
+                    setUser(user); 
+                    document.getElementById('enroll_course_modal').close(); 
+                    setLoading(false); 
+                    alert("Enrolled!"); 
+                    });
                 }
               });
             })
     }
 
 
-    let mappedCourseSessions = courseSessions.map((course)=> <p className="text-sm">{course.title}</p>)
+    let mappedCourseSessions = courseSessions.map((course)=> <p className="text-sm" key={courseSessions.id}>{course.title}</p>)
+
 
     let enrollCourseModal =
         <div>
-            <button className="btn btn-sm btn-outline btn-error" onClick={() => document.getElementById('enroll_course_modal').showModal()}>REMOVE</button>
+            <button className="btn btn-outline btn-block btn-accent" onClick={() => document.getElementById('enroll_course_modal').showModal()}>Enroll</button>
             <dialog id="enroll_course_modal" className="modal">
-                <div className="modal-box bg-[#111111]">
+                <div className="modal-box bg-[#111111] flex flex-col gap-1">
                     <form method="dialog">
                         <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                     </form>
                     <h3 className="font-bold text-lg">Enrollment: {courseTitle}</h3>
                     <p className="py-4">{courseDescription}</p>
                     {courseInstructor && <div className='flex flex-col justify-center'>
-                        <p className="py-4">{courseInstructor.name}</p>
-                        <p className="py-4">{courseInstructor._email}</p>
+                        <p className="font-bold">Course Instructor:</p>
+                        <p className="">{courseInstructor.name}</p>
+                        <p className="">{courseInstructor._email}</p>
                     </div>}
                     <div>
-                        <button className="btn btn-outline btn-success" onClick={(e) => handleEnrollInCourse(e)}>ENROLL IN: {courseTitle}</button>
+                        <button className="btn btn-outline btn-block btn-success" onClick={(e) => handleEnrollInCourse(e)}> {loading ? <span className="loading loading-dots loading-sm"></span>: `Enroll In: ${courseTitle}`} </button>
                     </div>
                 </div>
             </dialog>
@@ -70,7 +80,7 @@ function CoursesBrowserTile({user, course}) {
         <div className="card w-200 bg-[#111111] shadow-xl">
             <div className="card-body">
                 <div className="grid grid-cols-2 gap-2">
-                    <div class="flex flex-col">
+                    <div className="flex flex-col">
                         <div className='flex flex-row justify-between'>
                             <h2 className="card-title">{courseTitle}</h2>
                         </div>
@@ -89,7 +99,7 @@ function CoursesBrowserTile({user, course}) {
                     </div>}
                 </div>
                 <div className="card-actions justify-end">
-                    <button className="btn btn-outline btn-block btn-accent" onClick={enrollCourseModal}>Enroll?</button>
+                    {enrollCourseModal}
                 </div>
             </div>
         </div>

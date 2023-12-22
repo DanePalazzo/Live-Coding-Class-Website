@@ -10,7 +10,7 @@ import CreateNewProject from '../components/CreateNewProject';
 import CodeEditorReworked from '../components/CodeEditorReworked';
 
 
-function SessionRoom({ user, sessionId, setSessionId }) {
+function SessionRoom({ user, sessionId, setSessionId, activeSession, setActiveSession}) {
     //Checks if we have a user or session before running the page
     const navigate = useNavigate()
     useEffect(() => {
@@ -187,6 +187,8 @@ function SessionRoom({ user, sessionId, setSessionId }) {
         if (socket) {
             socket.disconnect()
             setConnected(false)
+            setSessionId(null)
+            setActiveSession(null)
         }
         navigate('/sessionsbrowser')
     }
@@ -228,7 +230,7 @@ function SessionRoom({ user, sessionId, setSessionId }) {
                 <label htmlFor="my-drawer" className="btn btn-outline btn-primary drawer-button">Projects</label>
             </div>
             <div className="navbar-center">
-                <h1 className='text-[#111111] font-extrabold'>SESSION</h1>
+                <h1 className='text-[#111111] font-extrabold'>{activeSession.title}</h1>
             </div>
             <div className="navbar-end">
                 <div className='flex flex-row gap-2'>

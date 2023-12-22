@@ -55,7 +55,8 @@ function CodeEditorReworked({ sessionId, connected, socket, user, activeProjects
         if (connected) {
             socket.on('document_change', (serverMessage) => {
                 console.log(`Document Changed: ${serverMessage}`)
-                setCodeValue(serverMessage.edit_content)
+                console.log(serverMessage.edited_content)
+                setCodeValue(serverMessage.edited_content)
             })
         }
     }, [connected]);
