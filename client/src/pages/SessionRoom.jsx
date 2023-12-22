@@ -30,6 +30,7 @@ function SessionRoom({ user, sessionId, setSessionId, activeSession, setActiveSe
     const [sessionProjects, setSessionProjects] = useState([])
     const [activeProjects, setActiveProjects] = useState([])
     const [hideChat, setHideChat] = useState(false)
+    const [createLoading, setCreateLoading] = useState(false)
     const location = useLocation();
 
     const activeProjectDocuments = activeProjects.map((activeProject) => activeProject.documents)
@@ -169,6 +170,8 @@ function SessionRoom({ user, sessionId, setSessionId, activeSession, setActiveSe
                 let updatedUserProjects = [...userProjects]
                 updatedUserProjects = [...updatedUserProjects, serverMessage]
                 setUserProjects(updatedUserProjects)
+                setCreateLoading(false)
+                document.getElementById('create_project_modal').close()
             })
         }
         return () => {
@@ -218,7 +221,7 @@ function SessionRoom({ user, sessionId, setSessionId, activeSession, setActiveSe
                     <form method="dialog">
                         <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                     </form>
-                    <CreateNewProject user={user} socket={socket} sessionId={sessionId} />
+                    <CreateNewProject user={user} socket={socket} sessionId={sessionId} createLoading={createLoading} setCreateLoading={setCreateLoading}/>
                 </div>
             </dialog>
         </div>
@@ -230,7 +233,7 @@ function SessionRoom({ user, sessionId, setSessionId, activeSession, setActiveSe
                 <label htmlFor="my-drawer" className="btn btn-outline btn-primary drawer-button">Projects</label>
             </div>
             <div className="navbar-center">
-                <h1 className='text-[#111111] font-extrabold'>{activeSession.title}</h1>
+                {activeSession?<h1 className='text-[#111111] font-extrabold'>{activeSession.title}</h1>:<span className="loading loading-dots loading-md text-neutral"></span>}
             </div>
             <div className="navbar-end">
                 <div className='flex flex-row gap-2'>

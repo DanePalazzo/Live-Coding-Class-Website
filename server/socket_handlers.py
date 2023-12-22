@@ -170,6 +170,7 @@ def document_update(user_id, session_id, document_id, edit_content):
 #PROJECT ADDED TO SESSION
 @socket_io.on('create_new_project_in_session')
 def handle_create_new_project_in_session(user_id, session_id, title, description):
+    print(f"New Project Recieved! user: {user_id}, session_id:{session_id}, title: {title}, description: {description}")
     try:
         new_project = Project(
             title=title,

@@ -1,11 +1,12 @@
 import {React, useState, useEffect} from 'react'
 
-function ProjectCard({ project, owner, sessionId, socket, sessionProjects }) {
+function ProjectCard({ project, ownerObject, owner, sessionId, socket, sessionProjects, shared }) {
     const [inSessionProjects, setInSessionProjects] = useState(false)
     // console.log(project)
-    // console.log(owner)
+    // console.log(ownerObject)
     // console.log(sessionProjects)
     // console.log(sessionProjectIds)
+
 
     let sessionProjectIds = sessionProjects.map((project) => project.id)
     // console.log(sessionProjectIds)
@@ -49,7 +50,7 @@ function ProjectCard({ project, owner, sessionId, socket, sessionProjects }) {
                 <h2 className="card-title">{project.title}</h2>
                 <p>Owner: {owner}</p>
                 <div className="flex flex-row justify-end">
-                    {shareWithSessionModal}
+                    {!shared && shareWithSessionModal}
                     <button className="btn btn-outline btn-sm btn-accent" onClick={() => handleProjectRequest()}>Set As Active</button>
                 </div>
             </div>
